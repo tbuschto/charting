@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "none",
+    "target": "ES2017",
+    "rootDir": "src",
+    "outDir": "dist",
+    "sourceMap": false,
+    "strict": true,
+    "noImplicitAny": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "strictNullChecks": false
+},
+"include": [
+    "src/**/*.ts"
+  ]
+}
