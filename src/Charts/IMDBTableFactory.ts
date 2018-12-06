@@ -1,4 +1,4 @@
-namespace App {
+namespace Charts {
 
   enum Column {
     UserRating = 'Your Rating',
@@ -17,7 +17,17 @@ namespace App {
     rating: number;
   }
 
-  export class IMDBItemFactory {
+  export class IMDBTableFactory {
+
+    createTable(data: string): IMDBItem[] {
+      const rows = data.trim().split('\n');
+      const factory = new IMDBItemFactory(rows.shift());
+      return rows.map(row => factory.createItem(row));
+    }
+
+  }
+
+  class IMDBItemFactory {
 
     private _userRatingIndex: number;
     private _titleIndex: number;
