@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "module": "none",
-    "target": "ES2017",
+    "module": "commonjs",
     "rootDir": "src",
     "outDir": "dist",
+    "lib": ["es2017", "dom"],
     "sourceMap": false,
     "strict": true,
     "noImplicitAny": true,
