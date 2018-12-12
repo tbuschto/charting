@@ -1,11 +1,11 @@
-import {Store} from 'redux'
-import {Chart} from 'chart.js'
-import {Observable, from} from 'rxjs'
-import {distinctUntilKeyChanged} from 'rxjs/operators'
-import {ActionCreators} from './ActionCreators';
-import {FileService} from './FileService';
-import {ImdbTableFactory, ImdbTable} from './ImdbTableFactory';
-import {Action} from './ActionCreators';
+import { Store } from 'redux'
+import { Observable, from } from 'rxjs'
+import { distinctUntilKeyChanged } from 'rxjs/operators'
+import { ImdbTable } from './ImdbTableFactory';
+import { Action } from './ActionCreators';
+import { ImdbChart } from './ChartView';
+import { FilePicker } from './FilePicker';
+import { View } from './View';
 
 export interface AppState {
   showUserRatings: boolean;
@@ -13,57 +13,49 @@ export interface AppState {
   imdbTable: ImdbTable;
 }
 
-export type AppStore = Store<AppState, Action<any>> & {
-  [Symbol.observable]: () => Observable<AppState>
-};
+declare module 'redux' {
+  interface Store { // Fix redux type declaration to work with rxjs
+    [Symbol.observable]: () => Observable<AppState>
+  }
+}
+
+export type AppStore = Store<AppState, Action<any>>;
 
 export class App {
 
+  private _mainView: View = null;
+
   constructor(
+    public container: HTMLElement,
     private _store: AppStore,
-    private _imdbTableFactory: ImdbTableFactory,
-    private _fileService: FileService,
-    private _actions: ActionCreators
-  ) {}
+    private _filePicker: FilePicker,
+    private _imdbChart: ImdbChart
+  ) { }
 
   public async start() {
     const state = from(this._store);
     state.pipe(distinctUntilKeyChanged('imdbTable')).subscribe(({imdbTable}) => {
-      if (imdbTable) {
-        this.createChart(imdbTable);
-      }
-    })
-    this._store.dispatch(this._actions.setImdbTable(await this.createTable()));
-  }
-
-  async createTable(): Promise<ImdbTable> {
-    return this._imdbTableFactory.createTable(await this._fileService.getTextFiles());
-  }
-
-  createChart(table: ImdbTable): Chart {
-    const chartContainer = document.createElement('div');
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-    Object.assign(chartContainer.style, {width: '800px', height: '1200px'});
-    chartContainer.append(canvas);
-    document.body.append(chartContainer);
-    const type: Chart.ChartType = 'scatter';
-    return new Chart(ctx, {
-      type,
-      options: {
-        title: {display: true, text: `${table.length} Titles`},
-      },
-      data: {
-        datasets: [
-          {
-            data: table.map<Chart.ChartPoint>(item => ({
-              x: item.release.getFullYear(),
-              y: item.userRating
-            }))
-          }
-        ]
+      if (imdbTable && imdbTable.length) {
+        this.mainView = this._imdbChart;
+      } else {
+        this.mainView = this._filePicker;
       }
     });
+  }
+
+  public set mainView(value: View) {
+    if (this._mainView === value) {
+      return;
+    }
+    if (this._mainView) {
+      this._mainView.element.remove();
+    }
+    this._mainView = value;
+    this.container.appendChild(this._mainView.element)
+  }
+
+  public get mainView() {
+    return this._mainView;
   }
 
 }

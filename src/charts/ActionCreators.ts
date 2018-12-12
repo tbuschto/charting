@@ -1,22 +1,30 @@
-import {ImdbTable} from './ImdbTableFactory';
+import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
+
+export enum ActionTypes {
+  SHOW_USER_RATINGS, SHOW_IMDB_RATINGS, ADD_TABLE_DATA
+}
 
 export interface Action<Payload = never> {
-  type: 'TOGGLE_USER_RATINGS' | 'TOGGLE_IMDB_RATINGS' |'SET_IMDB_TABLE',
+  type: ActionTypes,
   payload?: Payload
 }
 
 export class ActionCreators {
 
-  public toggleUserRatings(): Action {
-    return { type: 'TOGGLE_USER_RATINGS' }
+  constructor(
+    private _imdbTableFactory: ImdbTableFactory
+  ) {}
+
+  public showUserRatings(): Action<boolean> {
+    return { type: ActionTypes.SHOW_USER_RATINGS }
   }
   ​
-  public toggleImdbRatings(): Action  {
-    return { type: 'TOGGLE_IMDB_RATINGS' }
+  public showImdbRatings(): Action<boolean>  {
+    return { type: ActionTypes.SHOW_IMDB_RATINGS }
   }
 
-  public setImdbTable(payload: ImdbTable): Action<ImdbTable>  {
-    return { type: 'SET_IMDB_TABLE', payload };
+  public addTableData(data: string): Action<ImdbTable>  {
+    return { type: ActionTypes.ADD_TABLE_DATA, payload: this._imdbTableFactory.createTable(data) };
   }
 
 }

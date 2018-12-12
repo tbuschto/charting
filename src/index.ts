@@ -1,21 +1,40 @@
-import {createStore} from 'redux';
-import {App, AppStore} from './charts/App';
-import {Reducer} from './charts/Reducer';
-import {ActionCreators} from './charts/ActionCreators';
-import {FileService} from './charts/FileService';
-import {ImdbTableFactory} from './charts/ImdbTableFactory';
+import { createStore, applyMiddleware } from 'redux';
+import { App, AppStore } from './charts/App';
+import { Reducer } from './charts/Reducer';
+import { ImdbTableFilePicker } from './charts/FilePicker';
+import { ImdbChart } from './charts/ChartView';
+import { ImdbTableFactory } from './charts/ImdbTableFactory';
+import { ActionCreators } from './charts/ActionCreators';
+import { createLogger } from 'redux-logger';
 
-console.log('App start');
+(async () => {
 
-const store: AppStore = createStore(new Reducer().chartsApp, {
-  imdbTable: null,
-  showUserRatings: true,
-  showImdbRatings: false
-});
+  console.info('Init REDUX Store...');
 
-new App(
-  store,
-  new ImdbTableFactory(),
-  new FileService(),
-  new ActionCreators()
-).start();
+  const store: AppStore = createStore(
+    new Reducer().chartsApp,
+    {
+      imdbTable: [],
+      showUserRatings: true,
+      showImdbRatings: false
+    },
+    applyMiddleware(createLogger({}))
+  );
+
+  const actions = new ActionCreators(
+    new ImdbTableFactory()
+  );
+
+  console.info('App Start...');
+
+  await new App(
+    document.body,
+    store,
+    new ImdbTableFilePicker(store, actions),
+    new ImdbChart(store, actions)
+  ).start();
+
+  console.info('DONE');
+
+})();
+
