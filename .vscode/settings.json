@@ -2,5 +2,6 @@
   "cSpell.words": [
     "IMDB",
     "datasets"
-  ]
+  ],
+  "typescript.preferences.quoteStyle": "single"
 }

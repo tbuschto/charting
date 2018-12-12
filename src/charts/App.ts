@@ -6,6 +6,7 @@ import { Action } from './ActionCreators';
 import { ImdbChart } from './ChartView';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
+import { MainView } from './MainView';
 
 export interface AppState {
   showUserRatings: boolean;
@@ -23,39 +24,39 @@ export type AppStore = Store<AppState, Action>;
 
 export class App {
 
-  private _mainView: View = null;
+  private _content?: View = null;
 
   constructor(
     public container: HTMLElement,
     private _store: AppStore,
     private _filePicker: FilePicker,
-    private _imdbChart: ImdbChart
+    private _mainView: MainView
   ) { }
 
   public async start() {
     const state = from(this._store);
     state.pipe(distinctUntilKeyChanged('imdbTable')).subscribe(({imdbTable}) => {
       if (imdbTable && imdbTable.length) {
-        this.mainView = this._imdbChart;
+        this.content = this._mainView;
       } else {
-        this.mainView = this._filePicker;
+        this.content = this._filePicker;
       }
     });
   }
 
-  public set mainView(value: View) {
-    if (this._mainView === value) {
+  public set content(value: View) {
+    if (this._content === value) {
       return;
     }
-    if (this._mainView) {
-      this._mainView.element.remove();
+    if (this._content) {
+      this._content.element.remove();
     }
-    this._mainView = value;
-    this.container.appendChild(this._mainView.element)
+    this._content = value;
+    this.container.appendChild(this._content.element)
   }
 
-  public get mainView() {
-    return this._mainView;
+  public get content() {
+    return this._content;
   }
 
 }

@@ -2,10 +2,11 @@ import { createStore, applyMiddleware } from 'redux';
 import { App, AppStore } from './charts/App';
 import { Reducer } from './charts/Reducer';
 import { ImdbTableFilePicker } from './charts/FilePicker';
-import { ImdbChart } from './charts/ChartView';
 import { ImdbTableFactory } from './charts/ImdbTableFactory';
 import { ActionCreators } from './charts/ActionCreators';
 import { createLogger } from 'redux-logger';
+import { MainView } from './charts/MainView';
+import { ImdbTableToChartDataConverter } from './charts/ImdbTableToChartDataConverter';
 
 (async () => {
 
@@ -31,7 +32,11 @@ import { createLogger } from 'redux-logger';
     document.body,
     store,
     new ImdbTableFilePicker(store, actions),
-    new ImdbChart(store, actions)
+    new MainView(
+      store,
+      actions,
+      new ImdbTableToChartDataConverter()
+    )
   ).start();
 
   console.info('DONE');

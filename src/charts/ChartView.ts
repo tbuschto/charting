@@ -4,6 +4,7 @@ import { Chart } from 'chart.js';
 import { ActionCreators } from "./ActionCreators";
 import { from } from "rxjs";
 import { distinctUntilKeyChanged } from "rxjs/operators";
+import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 
 export class ChartView extends View<'canvas'> {
 
@@ -61,22 +62,16 @@ export class ImdbChart extends ChartView {
 
   constructor(
     store: AppStore,
-    actions: ActionCreators
+    actions: ActionCreators,
+    converter: ImdbTableToChartDataConverter
   ) {
     super();
-    from(store).pipe(distinctUntilKeyChanged('imdbTable')).subscribe(({imdbTable}) => {
-      if (!imdbTable.length) {
+    from(store).subscribe(state => {
+      if (!state.imdbTable.length) {
         return;
       }
-      this.title = `${imdbTable.length} Titles`;
-      this.data = [
-        {
-          data: imdbTable.map<Chart.ChartPoint>(item => ({
-            x: item.release.getFullYear(),
-            y: item.userRating
-          }))
-        }
-      ]
+      this.title = `${state.imdbTable.length} Titles`;
+      this.data = converter.convert(state);
     });
   }
 
