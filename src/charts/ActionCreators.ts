@@ -4,10 +4,19 @@ export enum ActionTypes {
   SHOW_USER_RATINGS, SHOW_IMDB_RATINGS, ADD_TABLE_DATA
 }
 
-export interface Action<Payload = never> {
-  type: ActionTypes,
-  payload?: Payload
+export interface AddTableDataAction {
+  type: ActionTypes.ADD_TABLE_DATA, payload: ImdbTable
 }
+
+export interface ShowUserRatingsAction {
+  type: ActionTypes.SHOW_USER_RATINGS, payload: boolean
+}
+
+export interface ShowImdbRatingsAction {
+  type: ActionTypes.SHOW_IMDB_RATINGS, payload: boolean
+}
+
+export type Action = AddTableDataAction | ShowImdbRatingsAction | ShowUserRatingsAction;
 
 export class ActionCreators {
 
@@ -15,16 +24,19 @@ export class ActionCreators {
     private _imdbTableFactory: ImdbTableFactory
   ) {}
 
-  public showUserRatings(): Action<boolean> {
-    return { type: ActionTypes.SHOW_USER_RATINGS }
+  public showUserRatings(payload: boolean): ShowUserRatingsAction {
+    return { type: ActionTypes.SHOW_USER_RATINGS, payload }
   }
   ​
-  public showImdbRatings(): Action<boolean>  {
-    return { type: ActionTypes.SHOW_IMDB_RATINGS }
+  public showImdbRatings(payload: boolean): ShowImdbRatingsAction  {
+    return { type: ActionTypes.SHOW_IMDB_RATINGS, payload }
   }
 
-  public addTableData(data: string): Action<ImdbTable>  {
-    return { type: ActionTypes.ADD_TABLE_DATA, payload: this._imdbTableFactory.createTable(data) };
+  public addTableData(data: string): AddTableDataAction  {
+    return {
+      type: ActionTypes.ADD_TABLE_DATA,
+      payload: this._imdbTableFactory.createTable(data)
+    };
   }
 
 }

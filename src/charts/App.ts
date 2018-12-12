@@ -19,7 +19,7 @@ declare module 'redux' {
   }
 }
 
-export type AppStore = Store<AppState, Action<any>>;
+export type AppStore = Store<AppState, Action>;
 
 export class App {
 
