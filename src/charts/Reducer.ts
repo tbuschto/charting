@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
 import {AppState} from './App';
-import {Action, ActionTypes} from './ActionCreators';
+import {ActionType, Action} from './ActionCreators';
 import {ImdbTable} from './ImdbTableFactory';
 
 export class Reducer {
@@ -12,15 +12,15 @@ export class Reducer {
 }
 
 function showUserRatings(state: boolean, action: Action): boolean {
-  return action.type === ActionTypes.SHOW_USER_RATINGS ? action.payload : !!state;
+  return action.type === ActionType.ShowUserRatings ? action.payload : !!state;
 }
 
 function showImdbRatings(state: boolean, action: Action): boolean {
-  return action.type === ActionTypes.SHOW_IMDB_RATINGS ? action.payload : !!state;
+  return action.type === ActionType.ShowImdbRatings ? action.payload : !!state;
 }
 
 function imdbTable(state: ImdbTable, action: Action): ImdbTable {
-  if (action.type === ActionTypes.ADD_TABLE_DATA) {
+  if (action.type === ActionType.AddTableData) {
     return action.payload;
   }
   return state || [];
