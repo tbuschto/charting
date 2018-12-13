@@ -23,5 +23,8 @@ function imdbTable(state: ImdbTable, action: Action): ImdbTable {
   if (action.type === ActionType.AddTableData) {
     return action.payload;
   }
+  if (action.type === ActionType.ClearTableData) {
+    return [];
+  }
   return state || [];
 }

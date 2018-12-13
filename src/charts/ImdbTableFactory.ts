@@ -4,14 +4,14 @@ enum Column {
   Type = 'Title Type',
   Rating = 'IMDb Rating',
   Genre = 'Genres',
-  Release ='Release Date'
+  Release = 'Release Date'
 }
 
 export interface ImdbItem {
   userRating: number;
   title: string;
   genre: string[];
-  release: Date;
+  release: string;
   rating: number;
 }
 
@@ -59,7 +59,7 @@ class ImdbItemFactory {
       genre: data[this._genreIndex].split(',').map(str => str.trim()),
       rating: parseFloat(data[this._ratingIndex]),
       userRating: parseFloat(data[this._userRatingIndex]),
-      release: new Date(data[this._releaseIndex])
+      release: data[this._releaseIndex]
     }
   }
 

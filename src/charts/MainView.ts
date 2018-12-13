@@ -4,6 +4,7 @@ import { AppStore } from './App';
 import { ActionCreators } from './ActionCreators';
 import { ShowImdbRatingsCheckBox, ShowUserRatingsCheckBox } from './CheckBox';
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
+import { ClearTableButton } from './Button';
 
 export class MainView extends View<'div'> {
 
@@ -16,7 +17,8 @@ export class MainView extends View<'div'> {
     this.append(
       new ImdbChart(store, actions, converter),
       new ShowImdbRatingsCheckBox(store, actions),
-      new ShowUserRatingsCheckBox(store, actions)
+      new ShowUserRatingsCheckBox(store, actions),
+      new ClearTableButton(store, actions)
     )
   }
 

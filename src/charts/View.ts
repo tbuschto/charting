@@ -4,7 +4,9 @@ export class View<T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNa
   extends EventEmitter
 {
 
+
   public readonly element: HTMLElementTagNameMap[T];
+  public onClick = this.registerEvent();
 
   constructor(
     tagName: T,
@@ -13,6 +15,7 @@ export class View<T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNa
   ) {
     super();
     this.element = document.createElement(tagName);
+    this.element.onclick = () => this.emit(this.onClick);
     Object.assign(this.element, attributes);
     Object.assign(this.element.style, styles);
   }

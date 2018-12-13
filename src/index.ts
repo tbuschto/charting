@@ -1,26 +1,35 @@
-import { createStore, applyMiddleware } from 'redux';
-import { App, AppStore } from './charts/App';
+import { createStore, applyMiddleware, compose } from 'redux';
+import { App, AppStore, AppState } from './charts/App';
 import { Reducer } from './charts/Reducer';
 import { ImdbTableFilePicker } from './charts/FilePicker';
 import { ImdbTableFactory } from './charts/ImdbTableFactory';
 import { ActionCreators } from './charts/ActionCreators';
 import { createLogger } from 'redux-logger';
 import { MainView } from './charts/MainView';
+import { Persistence } from './charts/Persistence';
 import { ImdbTableToChartDataConverter } from './charts/ImdbTableToChartDataConverter';
+import * as freeze from 'redux-freeze';
 
 (async () => {
 
   console.info('Init REDUX Store...');
 
+  const defaultState: AppState = {
+    imdbTable: [],
+    showUserRatings: true,
+    showImdbRatings: false
+  };
+
   const store: AppStore = createStore(
     new Reducer().chartsApp,
-    {
-      imdbTable: [],
-      showUserRatings: true,
-      showImdbRatings: false
-    },
-    applyMiddleware(createLogger({}))
+    Persistence.readState(defaultState),
+    applyMiddleware(
+      freeze as any, // broken type declaration of freeze
+      createLogger({})
+    )
   );
+
+  new Persistence(store);
 
   const actions = new ActionCreators(
     new ImdbTableFactory()

@@ -17,13 +17,13 @@ export class ImdbTableToChartDataConverter {
     const result: Chart.ChartDataSets[] = [];
     if (state.showImdbRatings) {
       result.push({data: table.map<Chart.ChartPoint>(item => ({
-        x: item.release.getFullYear(),
+        x: yearOf(item.release),
         y: item.rating
       }))});
     }
     if (state.showUserRatings) {
       result.push({data: table.map<Chart.ChartPoint>(item => ({
-        x: item.release.getFullYear(),
+        x: yearOf(item.release),
         y: item.userRating
       }))});
     }
@@ -33,7 +33,7 @@ export class ImdbTableToChartDataConverter {
   private groupByYear(imdbTable: ImdbTable): {[key: string]: ImdbItem[]} {
     const years: {[key: string]: ImdbItem[]} = {};
     imdbTable.forEach(item => {
-      const year = item.release.getFullYear();
+      const year = yearOf(item.release);
       if (!years[year]) {
         years[year] = [];
       }
@@ -42,4 +42,8 @@ export class ImdbTableToChartDataConverter {
     return years;
   }
 
+}
+
+function yearOf(date: string): number {
+  return new Date(date).getFullYear()
 }
