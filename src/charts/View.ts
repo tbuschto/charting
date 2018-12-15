@@ -20,10 +20,11 @@ export class View<T extends keyof HTMLElementTagNameMap = keyof HTMLElementTagNa
     Object.assign(this.element.style, styles);
   }
 
-  public append(...content: Array<View|string>) {
+  public append(...content: Array<View|string>): this {
     content.forEach(child => this.element.appendChild(
       typeof child === 'string' ? document.createTextNode(child) : child.element
     ));
+    return this;
   }
 
 }

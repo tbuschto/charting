@@ -16,7 +16,7 @@ export class ChartView extends View<'div'> {
   private _data: Chart.ChartDataSets[] = [];;
 
   constructor() {
-    super('div', {}, {maxWidth: '1600px', maxHeight: '800px'});
+    super('div', {id: 'chartwrapper'}, {});
   }
 
   public set data(value: Chart.ChartDataSets[]) {
@@ -75,7 +75,7 @@ export class ChartView extends View<'div'> {
   }
 
   private _create() {
-    this._canvas = new View('canvas', {id: Math.random()+ ''});
+    this._canvas = new View('canvas', {id: 'chart'});
     this.append(this._canvas);
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
@@ -83,7 +83,8 @@ export class ChartView extends View<'div'> {
         type: 'scatter',
         options: {
           title: {display: true, text: 'foo'},
-          legend: {display: false}
+          legend: {display: false},
+          maintainAspectRatio: false
         },
         data: {
           datasets: this.data

@@ -13,12 +13,14 @@ export class MainView extends View<'div'> {
     actions: ActionCreators,
     converter: ImdbTableToChartDataConverter
   ) {
-    super('div');
+    super('div', {id: 'mainview'});
     this.append(
       new ImdbChart(store, actions, converter),
-      new ShowImdbRatingsCheckBox(store, actions),
-      new ShowUserRatingsCheckBox(store, actions),
-      new ClearTableButton(store, actions)
+      new View('div', {id: 'controls'}).append(
+        new ShowImdbRatingsCheckBox(store, actions),
+        new ShowUserRatingsCheckBox(store, actions),
+        new ClearTableButton(store, actions)
+      )
     )
   }
 
