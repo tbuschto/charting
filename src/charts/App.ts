@@ -36,7 +36,7 @@ export class App {
   public async start() {
     const state = from(this._store);
     state.pipe(distinctUntilKeyChanged('imdbTable')).subscribe(({imdbTable}) => {
-      if (imdbTable && imdbTable.length) {
+      if (imdbTable.length) {
         this.content = this._mainView;
       } else {
         this.content = this._filePicker;

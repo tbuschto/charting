@@ -5,6 +5,9 @@ export class ImdbTableToChartDataConverter {
 
   public convert(state: AppState): Chart.ChartDataSets[] {
     const table = state.imdbTable;
+    if (!table.length) {
+      return [];
+    }
     if (!state.showImdbRatings && !state.showUserRatings) {
       const years = this.groupByYear(table);
       return [{
