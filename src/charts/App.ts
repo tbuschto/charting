@@ -3,7 +3,6 @@ import { Observable, from } from 'rxjs'
 import { distinctUntilKeyChanged } from 'rxjs/operators'
 import { ImdbTable } from './ImdbTableFactory';
 import { Action } from './ActionCreators';
-import { ImdbChart } from './ChartView';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
 import { MainView } from './MainView';

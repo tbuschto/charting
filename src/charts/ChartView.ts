@@ -7,6 +7,60 @@ import { distinctUntilKeyChanged } from "rxjs/operators";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import * as clone from 'clone';
 
+const darkGray = 'rgb(51, 51, 51)'
+const white = 'rgb(220, 220, 220)';
+const lightGray = 'rgb(140, 140, 140)';
+const gray = 'rgb(80, 80, 80)';
+
+const defaultOptions: Chart.ChartOptions = {
+  title: {
+    display: true,
+    text: '',
+    fontColor: white,
+    fontSize: 24,
+  },
+  tooltips: {
+    callbacks: {
+      label: (tooltip, data) => {
+        const dataSet = data.datasets[tooltip.datasetIndex];
+        const point = dataSet.data[tooltip.index] as any;
+        return (point.label || point.y || point) + '';
+      }
+    }
+  },
+  layout: {padding: 12},
+  legend: {display: false},
+  maintainAspectRatio: false,
+  scales: {
+    xAxes: [{
+      gridLines: {
+        color: gray,
+      },
+      ticks: {
+        fontColor: white,
+        padding: 8
+      }
+    }],
+    yAxes: [{
+      ticks: {
+        beginAtZero: true,
+         fontColor: white,
+        padding: 8
+      },
+      gridLines: {
+        color: gray,
+        zeroLineColor: lightGray
+      }
+    }]
+  },
+  elements: {
+    point: {
+      backgroundColor: white,
+      borderColor: gray
+    }
+  }
+};
+
 export class ChartView extends View<'div'> {
 
   private _chart: Chart;
@@ -16,7 +70,9 @@ export class ChartView extends View<'div'> {
   private _data: Chart.ChartDataSets[] = [];;
 
   constructor() {
-    super('div', {id: 'chartwrapper'}, {});
+    super('div', {id: 'chartwrapper'}, {
+      backgroundColor: darkGray
+    });
   }
 
   public set data(value: Chart.ChartDataSets[]) {
@@ -42,6 +98,7 @@ export class ChartView extends View<'div'> {
     if (!this._updatePending) {
       setTimeout(() => {
         this._updateChart();
+        this._updateTitle();
         this._updatePending = false;
       }, 100);
       this._updatePending = true;
@@ -60,18 +117,25 @@ export class ChartView extends View<'div'> {
       this._create();
       return;
     }
+    (this._chart as any).reset();
     const max = Math.max(this.data.length, this._chart.data.datasets.length);
     // For animations to work the existing datasets may never be replaced or removed entirely
     for (let i = 0; i < max; i++) {
       if (this._chart.data.datasets[i] && this._data[i]) {
-        this._chart.data.datasets[i].data = this._data[i].data;
+        Object.assign(this._chart.data.datasets[i], this._data[i]);
       } else if (!this._chart.data.datasets[i] && this._data[i]) {
         this._chart.data.datasets[i] = this._data[i];
       } else {
-        delete this._chart.data.datasets[i].data;
+        this._chart.data.datasets[i].data = [];
       }
     }
     this._chart.update();
+  }
+
+  private _updateTitle() {
+    if (this._chart) {
+      this._chart.config.options.title.text = this.title;
+    }
   }
 
   private _create() {
@@ -81,11 +145,7 @@ export class ChartView extends View<'div'> {
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
       {
         type: 'scatter',
-        options: {
-          title: {display: true, text: 'foo'},
-          legend: {display: false},
-          maintainAspectRatio: false
-        },
+        options: clone(defaultOptions),
         data: {
           datasets: this.data
         }
