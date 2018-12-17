@@ -2,8 +2,7 @@ import { AppStore } from "./App";
 import { View } from "./View";
 import { Chart } from 'chart.js';
 import { ActionCreators } from "./ActionCreators";
-import { from, VirtualTimeScheduler } from "rxjs";
-import { distinctUntilKeyChanged } from "rxjs/operators";
+import { from } from "rxjs";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import * as clone from 'clone';
 
