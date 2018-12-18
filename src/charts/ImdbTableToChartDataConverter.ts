@@ -10,23 +10,29 @@ export class ImdbTableToChartDataConverter {
     }
     const items = Object.keys(table).map(id => table[id]);
     const result: Chart.ChartDataSets[] = [];
-    state.users.forEach(user => {
+    state.users.forEach((user, i) => {
       if (user.show) {
-        result.push(this.getRatings(items, user.name, user.color));
+        result.push(this.getRatings(items, user.name, user.color, i * 0.2));
       }
     })
     return result;
   }
 
-  private getRatings(items: ImdbItem[], rating: string, color: string) {
+  private getRatings(
+    items: ImdbItem[],
+    rating: string,
+    color: string,
+    offset: number
+  ): Chart.ChartDataSets {
     return {
+      label: rating,
       backgroundColor: color,
       borderColor: color,
       pointHoverBorderColor: 'white',
       pointRadius: 4,
       data: items.filter(item => rating in item.ratings).map<Chart.ChartPoint>(item => ({
         label: `${item.title}: ${item.ratings[rating]}`,
-        x: yearOf(item.release),
+        x: yearOf(item.release) + offset,
         y: Math.min(item.ratings[rating], 9.99)
       }))
     };

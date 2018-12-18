@@ -28,7 +28,13 @@ const defaultOptions: Chart.ChartOptions = {
     }
   },
   layout: {padding: 12},
-  legend: {display: false},
+  legend: {
+    display: true,
+    position: "bottom",
+    labels: {
+      filter: (item, data) => data.datasets[item.datasetIndex].data.length > 0
+    }
+  },
   maintainAspectRatio: false,
   scales: {
     xAxes: [{
@@ -37,13 +43,16 @@ const defaultOptions: Chart.ChartOptions = {
       },
       ticks: {
         fontColor: white,
-        padding: 8
+        padding: 8,
+        min: 1920,
+        max: 2020
       }
     }],
     yAxes: [{
       ticks: {
         beginAtZero: true,
-         fontColor: white,
+        max: 10,
+        fontColor: white,
         padding: 8
       },
       gridLines: {
@@ -126,6 +135,7 @@ export class ChartView extends View<'div'> {
         this._chart.data.datasets[i] = this._data[i];
       } else {
         this._chart.data.datasets[i].data = [];
+        this._chart.data.datasets[i].hideInLegendAndTooltip = true;
       }
     }
     this._chart.update();
