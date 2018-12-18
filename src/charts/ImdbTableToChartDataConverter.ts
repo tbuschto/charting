@@ -1,73 +1,40 @@
 import { AppState } from './App';
-import { ImdbTable, ImdbItem } from './ImdbTableFactory';
-
-const COLOR_IMDB = 'rgb(245, 197, 24)';
-const COLOR_USER = 'rgb(66, 104, 241)';
-const COLOR_GENERIC = 'rgb(2, 172, 211)';
+import { ImdbItem } from './ImdbTableFactory';
 
 export class ImdbTableToChartDataConverter {
 
   public convert(state: AppState): Chart.ChartDataSets[] {
     const table = state.imdbTable;
-    if (!table.length) {
+    if (!Object.keys(table).length) {
       return [];
     }
+    const items = Object.keys(table).map(id => table[id]);
     const result: Chart.ChartDataSets[] = [];
-    if (!state.showImdbRatings && !state.showUserRatings) {
-      result.push(this.getStatisticalData(table));
-    }
-    if (state.showUserRatings) {
-      result.push(this.getUserRatingData(table));
-    }
-    if (state.showImdbRatings) {
-      result.push(this.getImdbRatingData(table));
-    }
+    state.users.forEach(user => {
+      if (user.show) {
+        result.push(this.getRatings(items, user.name, user.color));
+      }
+    })
     return result;
   }
 
-  private getStatisticalData(table: ImdbTable) {
-    const years = this.groupByYear(table);
+  private getRatings(items: ImdbItem[], rating: string, color: string) {
     return {
-      backgroundColor: COLOR_GENERIC,
-      borderColor: COLOR_GENERIC,
+      backgroundColor: color,
+      borderColor: color,
       pointHoverBorderColor: 'white',
       pointRadius: 4,
-      data: Object.keys(years).sort().map<Chart.ChartPoint>(year => ({
-        x: parseInt(year, 10),
-        y: years[year].length
+      data: items.filter(item => rating in item.ratings).map<Chart.ChartPoint>(item => ({
+        label: `${item.title}: ${item.ratings[rating]}`,
+        x: yearOf(item.release),
+        y: Math.min(item.ratings[rating], 9.99)
       }))
-    }
+    };
   }
 
-  private getImdbRatingData(table: ImdbTable) {
-    return {
-      backgroundColor: COLOR_IMDB,
-      borderColor: COLOR_IMDB,
-      pointHoverBorderColor: 'white',
-      pointRadius: 4,
-      data: table.map<Chart.ChartPoint>(item => ({
-      label: `${item.title}: ${item.rating}`,
-      x: yearOf(item.release),
-      y: item.rating
-    }))};
-  }
-
-  private getUserRatingData(table: ImdbTable) {
-    return {
-      backgroundColor: COLOR_USER,
-      borderColor: COLOR_USER,
-      pointHoverBorderColor: 'white',
-      pointRadius: 4,
-      data: table.map<Chart.ChartPoint>(item => ({
-      label: `${item.title}: ${item.userRating}`,
-      x: yearOf(item.release),
-      y: Math.min(item.userRating, 9.99)
-    }))};
-  }
-
-  private groupByYear(imdbTable: ImdbTable): {[key: string]: ImdbItem[]} {
+  private groupByYear(items: ImdbItem[]): {[key: string]: ImdbItem[]} {
     const years: {[key: string]: ImdbItem[]} = {};
-    imdbTable.forEach(item => {
+    items.forEach(item => {
       const year = yearOf(item.release);
       if (!years[year]) {
         years[year] = [];

@@ -2,7 +2,6 @@ import { View } from './View';
 import { ImdbChart } from './ChartView';
 import { AppStore } from './App';
 import { ActionCreators } from './ActionCreators';
-import { ShowImdbRatingsCheckBox, ShowUserRatingsCheckBox } from './CheckBox';
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import { ClearTableButton } from './Button';
 import { List, DataSetSelectionList } from './List';

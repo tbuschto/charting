@@ -2,17 +2,27 @@ import { AppStore } from './App'
 import { View } from './View'
 import { ActionCreators } from './ActionCreators';
 
+export type TextFile = {name: string, content: string};
+
 export class FilePicker extends View<'input'> {
 
-  public onFilePicked = this.registerEvent<(content: string) => any>();
+  public onFilesPicked = this.registerEvent<(files: TextFile[]) => any>();
 
   constructor() {
-    super('input', {type: 'file'});
+    super('input', {type: 'file', multiple: true});
     this.element.addEventListener('change', () => this.handleInputValueChanged());
   }
 
   private async handleInputValueChanged() {
-    this.emit(this.onFilePicked, await this.blobToString(this.element.files[0]));
+    const textFiles: TextFile[] = [];
+    const files = this.element.files;
+    for (let i = 0; i < files.length; i++) {
+      textFiles[i] = {
+        name: files[i].name,
+        content: await this.blobToString(files[i])
+      };
+    }
+    this.emit(this.onFilesPicked, textFiles);
   }
 
   private async blobToString(blob: Blob): Promise<string> {
@@ -28,8 +38,6 @@ export class FilePicker extends View<'input'> {
 export class ImdbTableFilePicker extends FilePicker {
   constructor(store: AppStore, actions: ActionCreators) {
     super();
-    this.onFilePicked(content => {
-      store.dispatch(actions.addTableData(content))
-    });
+    this.onFilesPicked(content => store.dispatch(actions.addFiles(content)));
   }
 }

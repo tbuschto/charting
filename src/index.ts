@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { App, AppStore, AppState } from './charts/App';
 import { Reducer } from './charts/Reducer';
 import { ImdbTableFilePicker } from './charts/FilePicker';
@@ -9,15 +9,15 @@ import { MainView } from './charts/MainView';
 import { Persistence } from './charts/Persistence';
 import { ImdbTableToChartDataConverter } from './charts/ImdbTableToChartDataConverter';
 import * as freeze from 'redux-freeze';
+import reduxThunk from 'redux-thunk';
 
 (async () => {
 
   console.info('Init REDUX Store...');
 
   const defaultState: AppState = {
-    imdbTable: [],
-    showUserRatings: true,
-    showImdbRatings: false
+    users: [],
+    imdbTable: {}
   };
 
   const store: AppStore = createStore(
@@ -25,9 +25,10 @@ import * as freeze from 'redux-freeze';
     Persistence.readState(defaultState),
     applyMiddleware(
       freeze as any, // broken type declaration of freeze
+      reduxThunk,
       createLogger({})
     )
-  );
+  ) as AppStore;
 
   new Persistence(store);
 

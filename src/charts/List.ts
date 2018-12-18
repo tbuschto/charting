@@ -2,6 +2,7 @@ import { View } from './View';
 import { AppStore } from './App';
 import { ActionCreators } from './ActionCreators';
 import { from } from 'rxjs';
+import { distinctUntilKeyChanged } from 'rxjs/operators';
 
 type Item = {value: string, selected: boolean};
 
@@ -40,15 +41,13 @@ export class List extends View<'select'> {
 export class DataSetSelectionList extends List {
   constructor(store: AppStore, actions: ActionCreators) {
     super();
-    from(store).subscribe(state => {
-      this.items = [
-        {value: 'IMDb', selected: state.showImdbRatings},
-        {value: 'User', selected: state.showUserRatings}
-      ];
+    from(store).pipe(distinctUntilKeyChanged('users')).subscribe(state => {
+      this.items = state.users.map(user => ({value: user.name, selected: user.show}));
     });
     this.onSelectionChanged(items => {
-      store.dispatch(actions.showImdbRatings(items[0].selected));
-      store.dispatch(actions.showUserRatings(items[1].selected));
+      const selection: {[user: string]: boolean} = {};
+      this.items.forEach(item => selection[item.value] = item.selected);
+      store.dispatch(actions.showUserRatings(selection));
     });
   }
 }

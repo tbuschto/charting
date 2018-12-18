@@ -1,4 +1,5 @@
 enum Column {
+  Id = 'Const',
   UserRating = 'Your Rating',
   Title = 'Title',
   Type = 'Title Type',
@@ -8,35 +9,43 @@ enum Column {
 }
 
 export interface ImdbItem {
-  userRating: number;
+  id: string,
+  ratings: {IMDb: number, [user: string]: number}
   title: string;
   genre: string[];
   release: string;
-  rating: number;
 }
 
-export type ImdbTable = ImdbItem[];
+export type ImdbTable = {[id: string]: ImdbItem};
 
 export class ImdbTableFactory {
 
-  createTable(data: string): ImdbTable {
+  createTable(user: string, data: string): ImdbTable {
     const rows = data.trim().split('\n');
-    const factory = new ImdbItemFactory(rows.shift());
-    return rows.map(row => factory.createItem(row));
+    const factory = new ImdbItemFactory(user, rows.shift());
+    const table: ImdbTable = {};
+    rows.map(row => factory.createItem(row)).forEach(item => {
+      table[item.id] = item;
+    })
+    return table;
   }
 
 }
 
 class ImdbItemFactory {
 
+  private _idIndex: number;
   private _userRatingIndex: number;
   private _titleIndex: number;
   private _ratingIndex: number;
   private _genreIndex: number;
   private _releaseIndex: number;
+  private _user: string;
 
-  constructor(headerLine: string) {
+  constructor(user: string, headerLine: string) {
+    this._user = user;
     const columns = headerLine.split(',');
+    this._idIndex = columns.indexOf(Column.Id);
     this._userRatingIndex = columns.indexOf(Column.UserRating);
     this._titleIndex = columns.indexOf(Column.Title);
     this._ratingIndex = columns.indexOf(Column.Rating);
@@ -55,10 +64,13 @@ class ImdbItemFactory {
       }
     }
     return {
+      id: data[this._idIndex],
       title: data[this._titleIndex],
       genre: data[this._genreIndex].split(',').map(str => str.trim()),
-      rating: parseFloat(data[this._ratingIndex]),
-      userRating: parseFloat(data[this._userRatingIndex]),
+      ratings: {
+        IMDb: parseFloat(data[this._ratingIndex]),
+        [this._user]: parseFloat(data[this._userRatingIndex]),
+      },
       release: data[this._releaseIndex]
     }
   }

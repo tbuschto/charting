@@ -1,4 +1,7 @@
 import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
+import { TextFile } from './FilePicker';
+import { ThunkAction } from 'redux-thunk';
+import { AppState } from './App';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -7,13 +10,21 @@ export enum ActionType {
   ClearTableData = 'CLEAR_TABLE_DATA',
 }
 
+export type UserSelection = {[user: string]: boolean};
+
 type ActionBase<T extends string, Payload = void> = {type: T, payload?: Payload};
-type AddTableData = ActionBase<typeof ActionType.AddTableData, ImdbTable>;
-type ShowImdbRatings = ActionBase<typeof ActionType.ShowImdbRatings, boolean>;
-type ShowUserRatings = ActionBase<typeof ActionType.ShowUserRatings, boolean>;
+type AddTableData = ActionBase<typeof ActionType.AddTableData, {userName: string, data: ImdbTable}>;
+type ShowUserRatings = ActionBase<typeof ActionType.ShowUserRatings, UserSelection>;
 type ClearTableData = ActionBase<typeof ActionType.ClearTableData>;
 
-export type Action = AddTableData | ShowImdbRatings | ShowUserRatings | ClearTableData;
+export type Action = AddTableData | ShowUserRatings | ClearTableData;
+
+export type AsyncAction<R = Promise<void>|void> = ThunkAction<
+  R,
+  AppState,
+  void,
+  Action
+>;
 
 export class ActionCreators {
 
@@ -21,18 +32,26 @@ export class ActionCreators {
     private _imdbTableFactory: ImdbTableFactory
   ) { }
 
-  public showUserRatings(payload: boolean): ShowUserRatings {
-    return { type: ActionType.ShowUserRatings, payload }
+  public showUserRatings(payload: UserSelection): ShowUserRatings {
+    return {type: ActionType.ShowUserRatings, payload}
   }
   ​
-  public showImdbRatings(payload: boolean): ShowImdbRatings  {
-    return { type: ActionType.ShowImdbRatings, payload }
+  public addFiles(files: TextFile[]): AsyncAction {
+    return dispatch => {
+      return files.forEach(file => {
+        const userName = file.name.split('.').shift();
+        dispatch(this.addIMDbTableData(
+          userName,
+          this._imdbTableFactory.createTable(userName, file.content)
+        ))
+      });
+    }
   }
 
-  public addTableData(data: string): AddTableData  {
+  public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {
     return {
       type: ActionType.AddTableData,
-      payload: this._imdbTableFactory.createTable(data)
+      payload: {userName, data}
     };
   }
 

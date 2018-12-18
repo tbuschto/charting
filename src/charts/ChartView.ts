@@ -172,7 +172,7 @@ export class ImdbChart extends ChartView {
   ) {
     super();
     from(store).subscribe(state => {
-      this.title = `${state.imdbTable.length} Titles`;
+      this.title = `${Object.keys(state.imdbTable).length} Titles`;
       this.data = converter.convert(state);
     });
   }

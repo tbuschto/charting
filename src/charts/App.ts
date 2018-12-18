@@ -2,14 +2,15 @@ import { Store } from 'redux'
 import { Observable, from } from 'rxjs'
 import { distinctUntilKeyChanged } from 'rxjs/operators'
 import { ImdbTable } from './ImdbTableFactory';
-import { Action } from './ActionCreators';
+import { Action, AsyncAction } from './ActionCreators';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
 import { MainView } from './MainView';
 
+export type User = {name: string, color: string, show: boolean};
+
 export interface AppState {
-  showUserRatings: boolean;
-  showImdbRatings: boolean;
+  users: User[],
   imdbTable: ImdbTable;
 }
 
@@ -19,7 +20,9 @@ declare module 'redux' {
   }
 }
 
-export type AppStore = Store<AppState, Action>;
+export type AppStore = Store<AppState, Action> & {
+  dispatch<R>(asyncAction: AsyncAction<R>): R
+};
 
 export class App {
 
@@ -35,7 +38,7 @@ export class App {
   public async start() {
     const state = from(this._store);
     state.pipe(distinctUntilKeyChanged('imdbTable')).subscribe(({imdbTable}) => {
-      if (imdbTable.length) {
+      if (Object.keys(imdbTable).length) {
         this.content = this._mainView;
       } else {
         this.content = this._filePicker;
