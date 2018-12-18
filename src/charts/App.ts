@@ -8,9 +8,13 @@ import { View } from './View';
 import { MainView } from './MainView';
 
 export type User = {name: string, color: string, show: boolean};
+export type XAxisMode = 'Timeline' | 'Years' | 'Decades';
+export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT';
 
 export interface AppState {
-  users: User[],
+  xAxis: XAxisMode;
+  yAxis: YAxisMode;
+  users: User[];
   imdbTable: ImdbTable;
 }
 

@@ -16,6 +16,8 @@ import reduxThunk from 'redux-thunk';
   console.info('Init REDUX Store...');
 
   const defaultState: AppState = {
+    xAxis: 'Timeline',
+    yAxis: 'Distribution',
     users: [],
     imdbTable: {}
   };
