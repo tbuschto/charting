@@ -7,7 +7,8 @@ import { FilePicker } from './FilePicker';
 import { View } from './View';
 import { MainView } from './MainView';
 
-export type User = {name: string, color: string, show: boolean};
+export type Color = [number, number, number];
+export type User = {name: string, color: Color, show: boolean};
 export type XAxisMode = 'Timeline' | 'Years' | 'Decades';
 export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT';
 

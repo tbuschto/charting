@@ -1,16 +1,20 @@
 import {combineReducers} from 'redux';
-import {AppState, User, XAxisMode, YAxisMode} from './App';
+import {AppState, User, XAxisMode, YAxisMode, Color} from './App';
 import {ActionType, Action} from './ActionCreators';
 import {ImdbTable} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
 
-const COLOR_GENERIC = 'rgb(2, 172, 211)';
-const COLORS: string[] = ['rgb(66, 104, 241)', 'red', 'green'];
-const USER_IMDb: User = Object.freeze({
+const COLOR_GENERIC: Color = [2, 172, 211];
+const COLORS: Color[] = [
+  [66, 104, 241],
+  [250, 30, 30],
+  [30, 255, 30]
+];
+const USER_IMDb: User = {
   name: 'IMDb',
-  color: 'rgb(245, 197, 24)',
+  color: [245, 197, 24],
   show: true
-})
+};
 
 export class Reducer {
 

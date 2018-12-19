@@ -135,7 +135,6 @@ export class ChartView extends View<'div'> {
         this._chart.data.datasets[i] = this._data[i];
       } else {
         this._chart.data.datasets[i].data = [];
-        this._chart.data.datasets[i].hideInLegendAndTooltip = true;
       }
     }
     this._chart.update();
@@ -153,7 +152,7 @@ export class ChartView extends View<'div'> {
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
       {
-        type: 'scatter',
+        type: 'bubble',
         options: clone(defaultOptions),
         data: {
           datasets: this.data
