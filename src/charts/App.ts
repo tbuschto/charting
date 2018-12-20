@@ -1,11 +1,11 @@
 import { Store } from 'redux'
-import { Observable, from } from 'rxjs'
 import { distinctUntilKeyChanged } from 'rxjs/operators'
 import { ImdbTable } from './ImdbTableFactory';
 import { Action, AsyncAction } from './ActionCreators';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
 import { MainView } from './MainView';
+import { from } from 'rxjs';
 
 export type Color = [number, number, number];
 export type User = {name: string, color: Color, show: boolean};
@@ -17,12 +17,6 @@ export interface AppState {
   yAxis: YAxisMode;
   users: User[];
   imdbTable: ImdbTable;
-}
-
-declare module 'redux' {
-  interface Store { // Fix redux type declaration to work with rxjs
-    [Symbol.observable]: () => Observable<AppState>
-  }
 }
 
 export type AppStore = Store<AppState, Action> & {

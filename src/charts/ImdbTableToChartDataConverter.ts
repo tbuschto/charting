@@ -1,4 +1,4 @@
-import { AppState, Color, XAxisMode, User } from './App';
+import { AppState, XAxisMode, User } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 import { ChartDataSets } from 'chart.js';
 
@@ -34,7 +34,7 @@ export class ImdbTableToChartDataConverter {
           x: parseInt(cat),
           y: parseInt(rating),
           r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 10 : 1)) + 3
-        } as Chart.ChartPoint);
+        });
       }
     }
     return {
@@ -44,7 +44,7 @@ export class ImdbTableToChartDataConverter {
       hoverRadius: 0,
       hoverBorderColor: 'white',
       data
-    } as ChartDataSets; // casting needed due to broken type declarations
+    };
   }
 
   private getLabel(cat: string, rating: string, items: ImdbItem[]): string {

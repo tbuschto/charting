@@ -22,8 +22,11 @@ const defaultOptions: Chart.ChartOptions = {
     callbacks: {
       label: (tooltip, data) => {
         const dataSet = data.datasets[tooltip.datasetIndex];
-        const point = dataSet.data[tooltip.index] as any;
-        return (point.label || point.y || point) + '';
+        const point = dataSet.data[tooltip.index];
+        if (typeof point !== 'number') {
+          return (point.label || point.y || point) + '';
+        }
+        return point + '';
       }
     }
   },
@@ -39,7 +42,7 @@ const defaultOptions: Chart.ChartOptions = {
   scales: {
     xAxes: [{
       gridLines: {
-        color: gray,
+        color: gray
       },
       ticks: {
         fontColor: white,
@@ -126,7 +129,6 @@ export class ChartView extends View<'div'> {
       this._create();
       return;
     }
-    (this._chart as any).reset();
     const realDataSetCount = this._chart.data.datasets.filter(dataset => dataset.data.length).length;
     const max = Math.max(this.data.length, this._chart.data.datasets.length);
     const allowAnimation = realDataSetCount === 0
@@ -137,6 +139,7 @@ export class ChartView extends View<'div'> {
         Object.assign(this._chart.data.datasets[i], this._data[i]);
       } else if (!this._chart.data.datasets[i] && this._data[i]) {
         this._chart.data.datasets[i] = this._data[i];
+        (this._chart.data.datasets[i] as any).labels  = ['a', 'b', 'c']
       } else {
         this._chart.data.datasets[i].data = [];
       }
