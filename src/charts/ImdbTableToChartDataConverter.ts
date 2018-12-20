@@ -1,4 +1,4 @@
-import { AppState, Color } from './App';
+import { AppState, Color, XAxisMode, User } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 import { ChartDataSets } from 'chart.js';
 
@@ -13,45 +13,44 @@ export class ImdbTableToChartDataConverter {
     const result: Chart.ChartDataSets[] = [];
     state.users.forEach((user, i) => {
       if (user.show) {
-        result.push(this.getRatings(items, user.name, user.color));
+        const categories = this.groupByCategory(state.xAxis, items);
+        result.push(this.getRatings(categories, user, state.xAxis));
       }
     })
     return result;
   }
 
   private getRatings(
-    items: ImdbItem[],
-    ratingName: string,
-    color: Color
+    categories: {[key: string]: ImdbItem[]},
+    user: User,
+    xAxis: XAxisMode
   ): Chart.ChartDataSets {
-    const years = this.groupByYear(items);
     const data: Chart.ChartPoint[] = [];
-    for (let year in years) {
-      const ratings = this.groupByRating(years[year], ratingName);
+    for (let cat in categories) {
+      const ratings = this.groupByRating(categories[cat], user.name);
       for(let rating in ratings) {
-        let labels =
         data.push({
-          label: this.getLabel(year, rating, ratings[rating]),
-          x: parseInt(year),
+          label: this.getLabel(cat, rating, ratings[rating]),
+          x: parseInt(cat),
           y: parseInt(rating),
-          r: ratings[rating].length + 3
+          r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 10 : 1)) + 3
         } as Chart.ChartPoint);
       }
     }
     return {
-      label: ratingName,
-      backgroundColor: `rgb(${color.join(', ')}, 0.5)`,
-      borderColor: `rgb(${color.join(', ')})`,
+      label: user.name,
+      backgroundColor: `rgb(${user.color.join(', ')}, 0.5)`,
+      borderColor: `rgb(${user.color.join(', ')})`,
       hoverRadius: 0,
       hoverBorderColor: 'white',
       data
     } as ChartDataSets; // casting needed due to broken type declarations
   }
 
-  private getLabel(year: string, rating: string, items: ImdbItem[]): string {
+  private getLabel(cat: string, rating: string, items: ImdbItem[]): string {
     const titles: string[] = items.map(item => item.title);
-    const max = 4;
-    const result: Array<string|number> = [rating, ' (', year, '): '];
+    const max = 5;
+    const result: Array<string|number> = [];
     if (titles.length <= max) {
       result.push(titles.join(', '));
     } else {
@@ -61,16 +60,20 @@ export class ImdbTableToChartDataConverter {
     return result.join('');
   }
 
-  private groupByYear(items: ImdbItem[]): {[key: string]: ImdbItem[]} {
-    const years: {[key: string]: ImdbItem[]} = {};
+  private groupByCategory(
+    xAxis: XAxisMode,
+    items: ImdbItem[]
+  ): {[key: string]: ImdbItem[]} {
+    const categories: {[key: string]: ImdbItem[]} = {};
     items.forEach(item => {
       const year = yearOf(item.release);
-      if (!years[year]) {
-        years[year] = [];
+      const category = xAxis === 'Decades' ? (Math.floor(year / 10) * 10) + 5 : year;
+      if (!categories[category]) {
+        categories[category] = [];
       }
-      years[year].push(item);
+      categories[category].push(item);
     });
-    return years;
+    return categories;
   }
 
   private groupByRating(items: ImdbItem[], ratingName: string): {[key: string]: ImdbItem[]} {

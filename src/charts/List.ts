@@ -57,7 +57,6 @@ export class XAxisModeList extends List<XAxisMode> {
     super(3, false);
     from(store).pipe(distinctUntilKeyChanged('xAxis')).subscribe(({xAxis}) => {
       this.items = [
-        {value: 'Timeline', selected: xAxis === 'Timeline'},
         {value: 'Years', selected: xAxis === 'Years'},
         {value: 'Decades', selected: xAxis === 'Decades'}
       ];
