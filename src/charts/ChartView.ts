@@ -75,7 +75,8 @@ export class ChartView extends View<'div'> {
   private _title: string ='';
   private _canvas: View<'canvas'>;
   private _updatePending: boolean = false;
-  private _data: Chart.ChartDataSets[] = [];;
+  private _data: Chart.ChartDataSets[] = [];
+
 
   constructor() {
     super('div', {id: 'chartwrapper'}, {
@@ -126,7 +127,10 @@ export class ChartView extends View<'div'> {
       return;
     }
     (this._chart as any).reset();
+    const realDataSetCount = this._chart.data.datasets.filter(dataset => dataset.data.length).length;
     const max = Math.max(this.data.length, this._chart.data.datasets.length);
+    const allowAnimation = realDataSetCount === 0
+      || this.data.length === realDataSetCount;
     // For animations to work the existing datasets may never be replaced or removed entirely
     for (let i = 0; i < max; i++) {
       if (this._chart.data.datasets[i] && this._data[i]) {
@@ -137,7 +141,7 @@ export class ChartView extends View<'div'> {
         this._chart.data.datasets[i].data = [];
       }
     }
-    this._chart.update();
+    this._chart.update(allowAnimation ? 500 : 0);
   }
 
   private _updateTitle() {
