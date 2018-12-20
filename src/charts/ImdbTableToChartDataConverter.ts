@@ -2,41 +2,47 @@ import { AppState, XAxisMode, User } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 import { ChartDataSets } from 'chart.js';
 
+type Category = {name: string, items: ImdbItem[]};
+type Categories = Category[];
+
+export const YEAR_MIN = 1920;
+export const YEAR_MAX = 2020;
+
 export class ImdbTableToChartDataConverter {
 
-  public convert(state: AppState): Chart.ChartDataSets[] {
+  public convert(state: AppState): Chart.ChartData {
     const table = state.imdbTable;
-    if (!Object.keys(table).length) {
-      return [];
-    }
+    const result: Chart.ChartData = {datasets: [], labels: []};
     const items = Object.keys(table).map(id => table[id]);
-    const result: Chart.ChartDataSets[] = [];
-    state.users.forEach((user, i) => {
-      if (user.show) {
-        const categories = this.groupByCategory(state.xAxis, items);
-        result.push(this.getRatings(categories, user, state.xAxis));
-      }
-    })
+    if (items.length) {
+      state.users.forEach(user => {
+        if (user.show) {
+          const categories = this.groupByCategory(state.xAxis, items);
+          result.datasets.push(this.getRatings(categories, user, state.xAxis));
+          result.labels = categories.map(cat => cat.name);
+        }
+      })
+    }
     return result;
   }
 
   private getRatings(
-    categories: {[key: string]: ImdbItem[]},
+    categories: Categories,
     user: User,
     xAxis: XAxisMode
   ): Chart.ChartDataSets {
     const data: Chart.ChartPoint[] = [];
-    for (let cat in categories) {
-      const ratings = this.groupByRating(categories[cat], user.name);
+    categories.forEach((cat, i) => {
+      const ratings = this.groupByRating(cat.items, user.name);
       for(let rating in ratings) {
         data.push({
-          label: this.getLabel(cat, rating, ratings[rating]),
-          x: parseInt(cat),
+          label: this.getLabel(cat.name, ratings[rating]),
+          x: i,
           y: parseInt(rating),
-          r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 10 : 1)) + 3
+          r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 8 : 2)) + 3
         });
       }
-    }
+    });
     return {
       label: user.name,
       backgroundColor: `rgb(${user.color.join(', ')}, 0.5)`,
@@ -47,10 +53,10 @@ export class ImdbTableToChartDataConverter {
     };
   }
 
-  private getLabel(cat: string, rating: string, items: ImdbItem[]): string {
+  private getLabel(category: string, items: ImdbItem[]): string {
     const titles: string[] = items.map(item => item.title);
-    const max = 5;
-    const result: Array<string|number> = [];
+    const max = 3;
+    const result: Array<string|number> = [category, ': '];
     if (titles.length <= max) {
       result.push(titles.join(', '));
     } else {
@@ -60,21 +66,49 @@ export class ImdbTableToChartDataConverter {
     return result.join('');
   }
 
-  private groupByCategory(
-    xAxis: XAxisMode,
-    items: ImdbItem[]
-  ): {[key: string]: ImdbItem[]} {
-    const categories: {[key: string]: ImdbItem[]} = {};
+  private groupByCategory(xAxis: XAxisMode, items: ImdbItem[]): Categories {
+    if (xAxis === 'Decades') {
+      return this.groupByDecade(items);
+    }
+    return this.groupByYear(items);
+  }
+
+  private groupByYear(items: ImdbItem[]): Categories {
+    const unsort: {[year: number]: ImdbItem[]} = {};
     items.forEach(item => {
       const year = yearOf(item.release);
-      const category = xAxis === 'Decades' ? (Math.floor(year / 10) * 10) + 5 : year;
-      if (!categories[category]) {
-        categories[category] = [];
+      if (isNaN(year)) {
+        console.warn(`No release year for ${item.title}`);
+        return;
       }
-      categories[category].push(item);
+      const items = unsort[year] = unsort[year] || []
+      items.push(item);
     });
-    return categories;
+    const result: Categories = [];
+    for (let i = YEAR_MIN; i <= YEAR_MAX; i++) {
+      result[i - YEAR_MIN] = {name: i + '', items: unsort[i] || []};
+    }
+    return result;
   }
+
+  private groupByDecade(items: ImdbItem[]): Categories {
+    const unsort: {[decade: number]: ImdbItem[]} = {};
+    items.forEach(item => {
+      const decade = decadeOf(item.release);
+      if (isNaN(decade)) {
+        console.warn(`No release decade for ${item.title}`);
+        return;
+      }
+      const items = unsort[decade] = unsort[decade] || []
+      items.push(item);
+    });
+    const result: Categories = [];
+    for (let i = YEAR_MIN; i <= YEAR_MAX; i += 10) {
+      result[i - YEAR_MIN] = {name: i + 's', items: unsort[i] || []};
+    }
+    return result;
+  }
+
 
   private groupByRating(items: ImdbItem[], ratingName: string): {[key: string]: ImdbItem[]} {
     const ratings: {[key: string]: ImdbItem[]} = {};
@@ -88,6 +122,10 @@ export class ImdbTableToChartDataConverter {
     return ratings;
   }
 
+}
+
+function decadeOf(date: string): number {
+  return Math.floor(yearOf(date) / 10) * 10;
 }
 
 function yearOf(date: string): number {

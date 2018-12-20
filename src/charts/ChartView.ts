@@ -1,6 +1,6 @@
 import { AppStore } from "./App";
 import { View } from "./View";
-import { Chart } from 'chart.js';
+import { Chart, Scale } from 'chart.js';
 import { ActionCreators } from "./ActionCreators";
 import { from } from "rxjs";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
@@ -45,10 +45,12 @@ const defaultOptions: Chart.ChartOptions = {
         color: gray
       },
       ticks: {
+        callback(value, index, values) {
+          return (this as Scale).chart.data.labels[value] as string;
+        },
         fontColor: white,
         padding: 8,
-        min: 1920,
-        max: 2020
+        min: 0
       }
     }],
     yAxes: [{
@@ -78,7 +80,7 @@ export class ChartView extends View<'div'> {
   private _title: string ='';
   private _canvas: View<'canvas'>;
   private _updatePending: boolean = false;
-  private _data: Chart.ChartDataSets[] = [];
+  private _data: Chart.ChartData = {};
 
 
   constructor() {
@@ -87,7 +89,7 @@ export class ChartView extends View<'div'> {
     });
   }
 
-  public set data(value: Chart.ChartDataSets[]) {
+  public set data(value: Chart.ChartData) {
     this._data = clone(value);
     this._update();
   }
@@ -118,32 +120,35 @@ export class ChartView extends View<'div'> {
   }
 
   private _updateChart() {
-    if (!this._data.length && !this._chart) {
+    console.log('CHART UPDATE');
+    console.log(this._data);
+    if (!this._data.datasets.length && !this._chart) {
       return;
     }
-    if (!this._data.length && this._chart) {
+    if (!this._data.datasets.length && this._chart) {
       this._clean();
       return;
     }
-    if (!this._chart && this._data.length) {
+    if (!this._chart && this._data.datasets.length) {
       this._create();
       return;
     }
     const realDataSetCount = this._chart.data.datasets.filter(dataset => dataset.data.length).length;
-    const max = Math.max(this.data.length, this._chart.data.datasets.length);
+    const max = Math.max(this.data.datasets.length, this._chart.data.datasets.length);
     const allowAnimation = realDataSetCount === 0
-      || this.data.length === realDataSetCount;
+      || this.data.datasets.length === realDataSetCount;
     // For animations to work the existing datasets may never be replaced or removed entirely
     for (let i = 0; i < max; i++) {
-      if (this._chart.data.datasets[i] && this._data[i]) {
-        Object.assign(this._chart.data.datasets[i], this._data[i]);
-      } else if (!this._chart.data.datasets[i] && this._data[i]) {
-        this._chart.data.datasets[i] = this._data[i];
-        (this._chart.data.datasets[i] as any).labels  = ['a', 'b', 'c']
+      if (this._chart.data.datasets[i] && this._data.datasets[i]) {
+        Object.assign(this._chart.data.datasets[i], this._data.datasets[i]);
+      } else if (!this._chart.data.datasets[i] && this._data.datasets[i]) {
+        this._chart.data.datasets[i] = this._data.datasets[i];
       } else {
         this._chart.data.datasets[i].data = [];
       }
     }
+    this._chart.data.labels = this._data.labels || [];
+    this._chart.config.options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
     this._chart.update(allowAnimation ? 500 : 0);
   }
 
@@ -156,14 +161,14 @@ export class ChartView extends View<'div'> {
   private _create() {
     this._canvas = new View('canvas', {id: 'chart'});
     this.append(this._canvas);
+    const options = clone(defaultOptions);
+    options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
       {
         type: 'bubble',
-        options: clone(defaultOptions),
-        data: {
-          datasets: this.data
-        }
+        options: options,
+        data: this._data
       }
     );
   }

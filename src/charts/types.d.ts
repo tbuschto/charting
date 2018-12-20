@@ -14,6 +14,9 @@ declare module 'chart.js' {
   interface ChartDataSets {
     hoverRadius: number;
   }
+  export class Scale {
+    public chart: Chart;
+  }
 }
 
 // Extensions
