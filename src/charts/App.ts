@@ -1,6 +1,6 @@
 import { Store } from 'redux'
 import { distinctUntilKeyChanged } from 'rxjs/operators'
-import { ImdbTable } from './ImdbTableFactory';
+import { ImdbTable, ItemType } from './ImdbTableFactory';
 import { Action, AsyncAction } from './ActionCreators';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
@@ -11,8 +11,12 @@ export type Color = [number, number, number];
 export type User = {name: string, color: Color, show: boolean};
 export type XAxisMode = 'Years' | 'Decades' | 'Genre' | 'Rating';
 export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT' | 'Count' | 'Percent';
+export type ItemTypes = { [type in ItemType]: boolean };
+export type Genres = {[genre: string]: boolean};
 
 export interface AppState {
+  itemTypes: ItemTypes;
+  genres: { [genre: string]: boolean };
   xAxis: XAxisMode;
   yAxis: YAxisMode;
   users: User[];

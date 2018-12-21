@@ -8,8 +8,11 @@ enum Column {
   Release = 'Release Date'
 }
 
+export type ItemType = 'movie' | 'tvMovie' | 'video' | 'tvSeries' | 'videoGame' | 'tvMiniSeries';
+
 export interface ImdbItem {
   id: string,
+  type: ItemType,
   ratings: {IMDb: number, [user: string]: number}
   title: string;
   genre: string[];
@@ -40,6 +43,7 @@ class ImdbItemFactory {
   private _ratingIndex: number;
   private _genreIndex: number;
   private _releaseIndex: number;
+  private _typeIndex: number;
   private _user: string;
 
   constructor(user: string, headerLine: string) {
@@ -51,6 +55,7 @@ class ImdbItemFactory {
     this._ratingIndex = columns.indexOf(Column.Rating);
     this._genreIndex = columns.indexOf(Column.Genre);
     this._releaseIndex = columns.indexOf(Column.Release);
+    this._typeIndex = columns.indexOf(Column.Type);
   }
 
   public createItem(row: string): ImdbItem {
@@ -71,7 +76,8 @@ class ImdbItemFactory {
         IMDb: parseFloat(data[this._ratingIndex]),
         [this._user]: parseFloat(data[this._userRatingIndex]),
       },
-      release: data[this._releaseIndex]
+      release: data[this._releaseIndex],
+      type: data[this._typeIndex] as ItemType
     }
   }
 

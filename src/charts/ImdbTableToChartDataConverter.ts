@@ -1,6 +1,5 @@
 import { AppState, XAxisMode, User, YAxisMode } from './App';
 import { ImdbItem } from './ImdbTableFactory';
-import { ChartDataSets } from 'chart.js';
 
 type Category = {name: string, items: ImdbItem[]};
 type Categories = Category[];
@@ -10,10 +9,8 @@ export const YEAR_MAX = 2020;
 
 export class ImdbTableToChartDataConverter {
 
-  public convert(state: AppState): Chart.ChartData {
-    const table = state.imdbTable;
+  public convert(items: ImdbItem[], state: AppState): Chart.ChartData {
     const result: Chart.ChartData = {datasets: [], labels: []};
-    const items = Object.keys(table).map(id => table[id]);
     if (items.length) {
       state.users.forEach(user => {
         if (user.show) {

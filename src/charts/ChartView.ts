@@ -5,6 +5,7 @@ import { ActionCreators } from "./ActionCreators";
 import { from } from "rxjs";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import * as clone from 'clone';
+import { ImdbItemFilter } from './ImdbItemFilter';
 
 const darkGray = 'rgb(51, 51, 51)'
 const white = 'rgb(220, 220, 220)';
@@ -240,12 +241,15 @@ export class ImdbChart extends ChartView {
   constructor(
     store: AppStore,
     actions: ActionCreators,
-    converter: ImdbTableToChartDataConverter
+    converter: ImdbTableToChartDataConverter,
+    filter: ImdbItemFilter
   ) {
     super();
     from(store).subscribe(state => {
-      this.title = `${Object.keys(state.imdbTable).length} Titles`;
-      this.data = converter.convert(state);
+      const allItems = Object.keys(state.imdbTable).map(id => state.imdbTable[id]);
+      const items = filter.filter(allItems, state);
+      this.title = `${items.length} Titles`;
+      this.data = converter.convert(items, state);
       this.type = getChartType(state);
       this.max =
           state.yAxis === 'Count' ? undefined

@@ -1,8 +1,9 @@
 import { View } from './View';
-import { AppStore, XAxisMode, YAxisMode } from './App';
+import { AppStore, XAxisMode, YAxisMode, AppState } from './App';
 import { ActionCreators } from './ActionCreators';
 import { from } from 'rxjs';
 import { distinctUntilKeyChanged } from 'rxjs/operators';
+import { ItemType } from './ImdbTableFactory';
 
 type Item<T extends string = string> = {value: T, selected: boolean};
 
@@ -82,6 +83,32 @@ export class YAxisModeList extends List<YAxisMode> {
     });
     this.onSelectionChanged(items => {
       store.dispatch(actions.setYAxisMode(this.items.find(item => item.selected).value));
+    });
+  }
+}
+
+export class ItemTypeList extends List<ItemType> {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super(4, false);
+    from(store).pipe(distinctUntilKeyChanged('itemTypes')).subscribe(({itemTypes}) => {
+      this.items = [
+        {value: 'movie', selected: itemTypes.movie},
+        {value: 'tvMovie', selected: itemTypes.tvMovie},
+        {value: 'video', selected: itemTypes.video},
+        {value: 'tvSeries', selected: itemTypes.tvSeries},
+        {value: 'videoGame', selected: itemTypes.videoGame},
+        {value: 'tvMiniSeries', selected: itemTypes.tvMiniSeries}
+      ];
+    });
+    this.onSelectionChanged(items => {
+      store.dispatch(actions.setItemTypes({
+        movie: items[0].selected,
+        tvMovie: items[1].selected,
+        video: items[2].selected,
+        tvSeries: items[3].selected,
+        videoGame: items[4].selected,
+        tvMiniSeries: items[5].selected
+      }));
     });
   }
 }

@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
-import {AppState, User, XAxisMode, YAxisMode, Color} from './App';
+import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes} from './App';
 import {ActionType, Action} from './ActionCreators';
-import {ImdbTable} from './ImdbTableFactory';
+import {ImdbTable, ItemType} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
 
 const COLOR_GENERIC: Color = [2, 172, 211];
@@ -19,7 +19,7 @@ const USER_IMDb: User = {
 export class Reducer {
 
   public readonly chartsApp = combineReducers<AppState, Action>(
-    {imdbTable, users, xAxis, yAxis}
+    {imdbTable, users, xAxis, yAxis, itemTypes, genres}
   );
 
 }
@@ -46,6 +46,24 @@ function imdbTable(state: ImdbTable, action: Action): ImdbTable {
     return deepExtend({}, state, action.payload.data);
   }
   return state || {};
+}
+
+function itemTypes(state: ItemTypes, action: Action): ItemTypes {
+  if (action.type === ActionType.SetItemTypes) {
+    return action.payload;
+  }
+  return state || {
+    movie: true,
+    tvMiniSeries: false,
+    tvMovie: false,
+    tvSeries: false,
+    video: false,
+    videoGame: false
+  }
+}
+
+function genres(state: {[genre: string]: boolean}) {
+  return {};
 }
 
 function users(state: User[], action: Action): User[] {

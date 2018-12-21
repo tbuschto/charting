@@ -10,6 +10,7 @@ import { Persistence } from './charts/Persistence';
 import { ImdbTableToChartDataConverter } from './charts/ImdbTableToChartDataConverter';
 import * as freeze from 'redux-freeze';
 import reduxThunk from 'redux-thunk';
+import { ImdbItemFilter } from './charts/ImdbItemFilter';
 
 (async () => {
 
@@ -19,7 +20,16 @@ import reduxThunk from 'redux-thunk';
     xAxis: 'Years',
     yAxis: 'Distribution',
     users: [],
-    imdbTable: {}
+    imdbTable: {},
+    genres: {},
+    itemTypes: {
+      movie: true,
+      tvMiniSeries: false,
+      tvMovie: false,
+      tvSeries: false,
+      video: false,
+      videoGame: false
+    }
   };
 
   const store: AppStore = createStore(
@@ -47,7 +57,8 @@ import reduxThunk from 'redux-thunk';
     new MainView(
       store,
       actions,
-      new ImdbTableToChartDataConverter()
+      new ImdbTableToChartDataConverter(),
+      new ImdbItemFilter()
     )
   ).start();
 
