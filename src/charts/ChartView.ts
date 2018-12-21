@@ -263,7 +263,7 @@ export class ImdbChart extends ChartView {
       this.type = getChartType(state);
       this.max =
           state.yAxis === 'Count' ? undefined
-        : state.yAxis === 'Percent' ? undefined
+        : state.yAxis === 'Percent' ? 100
         : 10;
     });
   }
