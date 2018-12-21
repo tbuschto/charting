@@ -17,7 +17,7 @@ export class ImdbTableToChartDataConverter {
     if (items.length) {
       state.users.forEach(user => {
         if (user.show) {
-          const categories = this.groupByCategory(state.xAxis, items);
+          const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
           result.datasets.push(this.getDataSet(categories, user, state));
           result.labels = categories.map(cat => cat.name);
         }
@@ -82,7 +82,6 @@ export class ImdbTableToChartDataConverter {
       return ratings.reduce((prev, curr) => prev + (curr || 0)) / ratings.length
     }
     if (mode === 'Median') {
-      console.log(ratings);
       return ratings.sort()[Math.floor(ratings.length / 2)];
     }
     if (mode === 'RT') {
@@ -104,9 +103,9 @@ export class ImdbTableToChartDataConverter {
     return result.join('');
   }
 
-  private groupByCategory(xAxis: XAxisMode, items: ImdbItem[]): Categories {
+  private groupByCategory(xAxis: XAxisMode, yAxis: YAxisMode, items: ImdbItem[]): Categories {
     if (xAxis === 'Decades') {
-      return this.groupByDecade(items);
+      return this.groupByDecade(items, yAxis);
     }
     return this.groupByYear(items);
   }
@@ -129,7 +128,7 @@ export class ImdbTableToChartDataConverter {
     return result;
   }
 
-  private groupByDecade(items: ImdbItem[]): Categories {
+  private groupByDecade(items: ImdbItem[], yAxis: YAxisMode): Categories {
     const unsort: {[decade: number]: ImdbItem[]} = {};
     items.forEach(item => {
       const decade = decadeOf(item.release);
@@ -141,8 +140,12 @@ export class ImdbTableToChartDataConverter {
       items.push(item);
     });
     const result: Categories = [];
-    for (let i = YEAR_MIN; i <= YEAR_MAX; i += 10) {
+    for (let i = YEAR_MIN; i < YEAR_MAX; i += 10) {
       result.push({name: i + 's', items: unsort[i] || []});
+    }
+    if (yAxis === 'Distribution') {
+      result.push({name: '', items: []});
+      result.unshift({name: '', items: []});
     }
     return result;
   }
