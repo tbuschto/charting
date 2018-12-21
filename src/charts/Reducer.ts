@@ -24,7 +24,7 @@ export class Reducer {
 
 }
 
-function xAxis(state: XAxisMode = 'Timeline', action: Action): XAxisMode {
+function xAxis(state: XAxisMode = 'Years', action: Action): XAxisMode {
   if (action.type === ActionType.SetXAxisMode) {
     return action.payload;
   }

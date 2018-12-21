@@ -1,4 +1,4 @@
-import { AppState, XAxisMode, User } from './App';
+import { AppState, XAxisMode, User, YAxisMode } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 import { ChartDataSets } from 'chart.js';
 
@@ -18,7 +18,7 @@ export class ImdbTableToChartDataConverter {
       state.users.forEach(user => {
         if (user.show) {
           const categories = this.groupByCategory(state.xAxis, items);
-          result.datasets.push(this.getRatings(categories, user, state.xAxis));
+          result.datasets.push(this.getDataSet(categories, user, state));
           result.labels = categories.map(cat => cat.name);
         }
       })
@@ -26,12 +26,16 @@ export class ImdbTableToChartDataConverter {
     return result;
   }
 
-  private getRatings(
-    categories: Categories,
-    user: User,
-    xAxis: XAxisMode
-  ): Chart.ChartDataSets {
+  private getDataSet(categories: Categories, user: User, state: AppState): Chart.ChartDataSets {
+    if (state.yAxis === 'Distribution') {
+      return this.getAllRatings(categories, user, state);
+    }
+    return this.getAccumulatedRatings(categories, user, state);
+  }
+
+  private getAllRatings(categories: Categories, user: User, state: AppState): Chart.ChartDataSets {
     const data: Chart.ChartPoint[] = [];
+    const xAxis = state.xAxis;
     categories.forEach((cat, i) => {
       const ratings = this.groupByRating(cat.items, user.name);
       for(let rating in ratings) {
@@ -51,6 +55,40 @@ export class ImdbTableToChartDataConverter {
       hoverBorderColor: 'white',
       data
     };
+  }
+
+  private getAccumulatedRatings(categories: Categories, user: User, state: AppState): Chart.ChartDataSets {
+    const fallback = state.xAxis === 'Decades' ? 0 : undefined;
+    const data: number[] = categories.map(cat =>
+      roundTo(this.acc(itemsToRatings(cat.items, user), state.yAxis, fallback), 2)
+    );
+    const rgb = `rgb(${user.color.join(', ')})`;
+    return {
+      label: user.name,
+      backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
+      borderColor: rgb,
+      hoverRadius: 0,
+      hoverBorderColor: 'white',
+      lineTension: 0.33,
+      data
+    };
+  }
+
+  private acc(ratings: number[], mode: YAxisMode, fallback: any): number {
+    if (!ratings.length) {
+      return fallback;
+    }
+    if (mode === 'Average') {
+      return ratings.reduce((prev, curr) => prev + (curr || 0)) / ratings.length
+    }
+    if (mode === 'Median') {
+      console.log(ratings);
+      return ratings.sort()[Math.floor(ratings.length / 2)];
+    }
+    if (mode === 'RT') {
+      return (10 / ratings.length) * ratings.filter(i => i >= 7).length;
+    }
+    throw new Error('acc does not support mode ' + mode);
   }
 
   private getLabel(category: string, items: ImdbItem[]): string {
@@ -104,7 +142,7 @@ export class ImdbTableToChartDataConverter {
     });
     const result: Categories = [];
     for (let i = YEAR_MIN; i <= YEAR_MAX; i += 10) {
-      result[i - YEAR_MIN] = {name: i + 's', items: unsort[i] || []};
+      result.push({name: i + 's', items: unsort[i] || []});
     }
     return result;
   }
@@ -130,4 +168,16 @@ function decadeOf(date: string): number {
 
 function yearOf(date: string): number {
   return new Date(date).getFullYear()
+}
+
+function roundTo(value: number, points: number) {
+  if (typeof value !== 'number') {
+    return undefined;
+  }
+  const factor = 10^points;
+  return Math.round(value * factor) / factor;
+}
+
+function itemsToRatings(items: ImdbItem[], user: User): number[] {
+  return items.filter(item => user.name in item.ratings).map(item => item.ratings[user.name]);
 }

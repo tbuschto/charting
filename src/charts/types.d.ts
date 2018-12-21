@@ -12,7 +12,7 @@ declare module 'redux' {
 
 declare module 'chart.js' {
   interface ChartDataSets {
-    hoverRadius: number;
+    hoverRadius?: number;
   }
   export class Scale {
     public chart: Chart;

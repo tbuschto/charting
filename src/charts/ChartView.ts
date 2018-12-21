@@ -1,4 +1,4 @@
-import { AppStore } from "./App";
+import { AppStore, AppState } from "./App";
 import { View } from "./View";
 import { Chart, Scale } from 'chart.js';
 import { ActionCreators } from "./ActionCreators";
@@ -30,6 +30,7 @@ const defaultOptions: Chart.ChartOptions = {
       }
     }
   },
+  spanGaps: true,
   layout: {padding: 12},
   legend: {
     display: true,
@@ -45,12 +46,17 @@ const defaultOptions: Chart.ChartOptions = {
         color: gray
       },
       ticks: {
-        callback(value, index, values) {
-          return (this as Scale).chart.data.labels[value] as string;
+        callback(this: Scale, value, index, values) {
+          if (typeof value === 'number') {
+            return this.chart.data.labels[value] as string;
+          }
+          return value;
         },
         fontColor: white,
         padding: 8,
-        min: 0
+        min: 0,
+        maxTicksLimit: 10,
+        maxRotation: 0
       }
     }],
     yAxes: [{
@@ -74,10 +80,13 @@ const defaultOptions: Chart.ChartOptions = {
   }
 };
 
+type ChartType = 'bar' | 'line' | 'bubble';
+
 export class ChartView extends View<'div'> {
 
   private _chart: Chart;
-  private _title: string ='';
+  private _title: string = '';
+  private _type: ChartType = null;
   private _canvas: View<'canvas'>;
   private _updatePending: boolean = false;
   private _data: Chart.ChartData = {};
@@ -96,6 +105,15 @@ export class ChartView extends View<'div'> {
 
   public get data() {
     return this._data;
+  }
+
+  public set type(value: ChartType) {
+    this._type = value;
+    this._update();
+  }
+
+  public get type() {
+    return this._type;
   }
 
   public set title(value: string) {
@@ -124,6 +142,10 @@ export class ChartView extends View<'div'> {
     console.log(this._data);
     if (!this._data.datasets.length && !this._chart) {
       return;
+    }
+    if (this._chart && (this._type !== this._chart.config.type)) {
+      this._clean();
+      this._create();
     }
     if (!this._data.datasets.length && this._chart) {
       this._clean();
@@ -166,7 +188,7 @@ export class ChartView extends View<'div'> {
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
       {
-        type: 'bubble',
+        type: this._type,
         options: options,
         data: this._data
       }
@@ -195,7 +217,18 @@ export class ImdbChart extends ChartView {
     from(store).subscribe(state => {
       this.title = `${Object.keys(state.imdbTable).length} Titles`;
       this.data = converter.convert(state);
+      this.type = getChartType(state);
     });
   }
 
+}
+
+function getChartType(state: AppState): ChartType {
+  if (state.xAxis === 'Years') {
+    return state.yAxis === 'Distribution' ? 'bubble' : 'line';
+  }
+  if (state.xAxis === 'Decades' || state.xAxis === 'Genre') {
+    return state.yAxis === 'Distribution' ? 'bubble' : 'bar';
+  }
+  return 'bar'
 }

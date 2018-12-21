@@ -9,8 +9,8 @@ import { from } from 'rxjs';
 
 export type Color = [number, number, number];
 export type User = {name: string, color: Color, show: boolean};
-export type XAxisMode = 'Timeline' | 'Years' | 'Decades';
-export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT';
+export type XAxisMode = 'Years' | 'Decades' | 'Genre' | 'Rating';
+export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT' | 'Count' | 'Percent';
 
 export interface AppState {
   xAxis: XAxisMode;
