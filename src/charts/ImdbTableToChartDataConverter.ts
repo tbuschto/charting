@@ -41,6 +41,7 @@ export class ImdbTableToChartDataConverter {
       for(let rating in ratings) {
         data.push({
           label: this.getLabel(cat.name, ratings[rating]),
+          message: this.getMessage(cat.name, ratings[rating]),
           x: i,
           y: parseInt(rating),
           r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 8 : 2)) + 3
@@ -101,6 +102,10 @@ export class ImdbTableToChartDataConverter {
       result.push(' and ', titles.length - max, ' more...');
     }
     return result.join('');
+  }
+
+  private getMessage(category: string, items: ImdbItem[]): string {
+    return items.map(item => item.title).join('\n');
   }
 
   private groupByCategory(xAxis: XAxisMode, yAxis: YAxisMode, items: ImdbItem[]): Categories {

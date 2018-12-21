@@ -90,6 +90,7 @@ export class ChartView extends View<'div'> {
   private _canvas: View<'canvas'>;
   private _updatePending: boolean = false;
   private _data: Chart.ChartData = {};
+  private _max: number = 10;
 
 
   constructor() {
@@ -184,6 +185,15 @@ export class ChartView extends View<'div'> {
     this._canvas = new View('canvas', {id: 'chart'});
     this.append(this._canvas);
     const options = clone(defaultOptions);
+    options.onClick = (ev, elements) => {
+      const el = elements as any;
+      if (el && el[0] && typeof el[0]._datasetIndex === 'number'&& typeof el[0]._index === 'number') {
+        const dataset = this._chart.data.datasets[el[0]._datasetIndex];
+        if (dataset.data[el[0]._index] instanceof Object) {
+          alert((dataset.data[el[0]._index] as any).message);
+        }
+      }
+    };
     options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,

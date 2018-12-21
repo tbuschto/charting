@@ -24,5 +24,6 @@ declare module 'chart.js' {
 declare module 'chart.js' {
   interface ChartPoint {
     label: string;
+    message: string;
   }
 }
