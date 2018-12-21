@@ -19,7 +19,7 @@ const USER_IMDb: User = {
 export class Reducer {
 
   public readonly chartsApp = combineReducers<AppState, Action>(
-    {imdbTable, users, userLogic, xAxis, yAxis, itemTypes, genres}
+    {imdbTable, users, userLogic, xAxis, yAxis, itemTypes, genres, reverse, animate, bezier}
   );
 
 }
@@ -71,6 +71,27 @@ function userLogic(state: UserLogic, action: Action): UserLogic {
     return action.payload;
   }
   return state || 'OR';
+}
+
+function reverse(state: boolean, action: Action): boolean {
+  if (action.type === ActionType.SetReverse) {
+    return action.payload;
+  }
+  return !!state;
+}
+
+function animate(state: boolean, action: Action): boolean {
+  if (action.type === ActionType.SetAnimate) {
+    return action.payload;
+  }
+  return state === undefined ? true : state;
+}
+
+function bezier(state: boolean, action: Action): boolean {
+  if (action.type === ActionType.SetBezier) {
+    return action.payload;
+  }
+  return state === undefined ? true : state;
 }
 
 function users(state: User[], action: Action): User[] {

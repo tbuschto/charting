@@ -19,6 +19,7 @@ const defaultOptions: Chart.ChartOptions = {
     fontColor: white,
     fontSize: 24,
   },
+  animation: {},
   tooltips: {
     callbacks: {
       label: (tooltip, data) => {
@@ -92,7 +93,7 @@ export class ChartView extends View<'div'> {
   private _data: Chart.ChartData = {};
   private _max: number = 10;
   private _placeHolder: View = new View('h1').append('No Data');
-
+  private _animate: boolean = true;
 
   constructor() {
     super('div', {id: 'chartwrapper'}, {
@@ -136,6 +137,14 @@ export class ChartView extends View<'div'> {
 
   public get max() {
     return this._max;
+  }
+
+  public set animate(value: boolean) {
+    this._animate = value;
+  }
+
+  public get animate() {
+    return this._animate;
   }
 
   private _update() {
@@ -183,7 +192,7 @@ export class ChartView extends View<'div'> {
     }
     this._chart.data.labels = this._data.labels || [];
     this._updateOptions(this._chart.config.options);
-    this._chart.update(allowAnimation ? 500 : 0);
+    this._chart.update(this._animate && allowAnimation ? 500 : 0);
   }
 
   private _create() {
@@ -223,6 +232,7 @@ export class ChartView extends View<'div'> {
   private _updateOptions(options: Chart.ChartOptions) {
     options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
     options.title.text = this._title;
+    options.animation.duration = this._animate ? 400 : 0;
     if (this._max !== undefined) {
       options.scales.yAxes[0].ticks.max = this._max;
     } else {
@@ -247,6 +257,7 @@ export class ImdbChart extends ChartView {
       const items = filter.filter(allItems, state);
       this.title = `${items.length} Titles`;
       this.data = converter.convert(items, state);
+      this.animate = state.animate;
       this.type = getChartType(state);
       this.max =
           state.yAxis === 'Count' ? undefined

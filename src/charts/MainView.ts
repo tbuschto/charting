@@ -6,7 +6,7 @@ import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import { ClearTableButton } from './Button';
 import { DataSetSelectionList, XAxisModeList, YAxisModeList, ItemTypeList } from './List';
 import { ImdbItemFilter } from './ImdbItemFilter';
-import { SelectOrRadioButton, SelectAndRadioButton, SelectXorRadioButton } from './CheckBox';
+import { SelectOrRadioButton, SelectAndRadioButton, SelectXorRadioButton, AnimateCheckBox, BezierCheckBox, ReverseCheckBox } from './CheckBox';
 
 export class MainView extends View<'div'> {
 
@@ -26,6 +26,11 @@ export class MainView extends View<'div'> {
           new SelectOrRadioButton(store, actions),
           new SelectAndRadioButton(store, actions),
           new SelectXorRadioButton(store, actions)
+        ),
+        new View('p').append(
+          new AnimateCheckBox(store, actions),
+          new BezierCheckBox(store, actions),
+          new ReverseCheckBox(store, actions)
         ),
         new View('p').append('X-Axis:'),
         new XAxisModeList(store, actions),

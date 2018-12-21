@@ -11,7 +11,10 @@ export enum ActionType {
   SetXAxisMode = 'SET_X_AXIS_MODE',
   SetYAxisMode = 'SET_Y_AXIS_MODE',
   SetItemTypes = 'SET_ITEM_TYPES',
-  SetUserLogic = 'SET_USER_LOGIC'
+  SetUserLogic = 'SET_USER_LOGIC',
+  SetReverse = 'SET_REVERSE',
+  SetAnimate = 'SET_ANIMATE',
+  SetBezier = 'SET_BEZIER'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -24,6 +27,9 @@ type SetXAxisMode = ActionBase<typeof ActionType.SetXAxisMode, XAxisMode>;
 type SetYAxisMode = ActionBase<typeof ActionType.SetYAxisMode, YAxisMode>;
 type SetItemTypes = ActionBase<typeof ActionType.SetItemTypes, ItemTypes>;
 type SetUserLogic = ActionBase<typeof ActionType.SetUserLogic, UserLogic>;
+type SetReverse = ActionBase<typeof ActionType.SetReverse, boolean>;
+type SetAnimate = ActionBase<typeof ActionType.SetAnimate, boolean>;
+type SetBezier = ActionBase<typeof ActionType.SetBezier, boolean>;
 
 export type Action = AddTableData
   | ShowUserRatings
@@ -31,7 +37,10 @@ export type Action = AddTableData
   | SetXAxisMode
   | SetYAxisMode
   | SetItemTypes
-  | SetUserLogic;
+  | SetUserLogic
+  | SetReverse
+  | SetAnimate
+  | SetBezier;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -76,6 +85,18 @@ export class ActionCreators {
 
   public setUserLogic(payload: UserLogic): SetUserLogic {
     return {type: ActionType.SetUserLogic, payload};
+  }
+
+  public setReverse(payload: boolean): SetReverse {
+    return {type: ActionType.SetReverse, payload};
+  }
+
+  public setAnimate(payload: boolean): SetAnimate {
+    return {type: ActionType.SetAnimate, payload};
+  }
+
+  public setBezier(payload: boolean): SetBezier {
+    return {type: ActionType.SetBezier, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

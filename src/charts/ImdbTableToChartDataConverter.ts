@@ -11,8 +11,9 @@ export class ImdbTableToChartDataConverter {
 
   public convert(items: ImdbItem[], state: AppState): Chart.ChartData {
     const result: Chart.ChartData = {datasets: [], labels: []};
+    const users = state.reverse ? state.users.concat().reverse() : state.users;
     if (items.length) {
-      state.users.forEach(user => {
+      users.forEach(user => {
         if (user.show) {
           const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
           result.datasets.push(this.getDataSet(categories, user, state, items));
@@ -72,7 +73,7 @@ export class ImdbTableToChartDataConverter {
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
       borderColor: rgb,
       hoverBorderColor: 'white',
-      lineTension: 0.33,
+      lineTension: state.bezier ? 0.33 : 0,
       data
     };
   }
@@ -84,7 +85,7 @@ export class ImdbTableToChartDataConverter {
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
       borderColor: rgb,
       hoverBorderColor: 'white',
-      lineTension: 0.33,
+      lineTension: state.bezier ? 0.33 : 0,
       data: categories.map(cat => itemsToRatings(cat.items, user).length)
     };
   }
@@ -102,7 +103,7 @@ export class ImdbTableToChartDataConverter {
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
       borderColor: rgb,
       hoverBorderColor: 'white',
-      lineTension: 0.33,
+      lineTension: state.bezier ? 0.33 : 0,
       data: categories.map(cat => roundTo(factor * itemsToRatings(cat.items, user).length, 2))
     };
   }

@@ -23,6 +23,9 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
     userLogic: 'OR',
     imdbTable: {},
     genres: {},
+    reverse: false,
+    animate: true,
+    bezier: true,
     itemTypes: {
       movie: true,
       tvMiniSeries: false,

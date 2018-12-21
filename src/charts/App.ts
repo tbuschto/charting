@@ -13,7 +13,7 @@ export type XAxisMode = 'Years' | 'Decades' | 'Genre' | 'Rating';
 export type YAxisMode = 'Distribution' | 'Average' | 'Median' | 'RT' | 'Count' | 'Percent';
 export type ItemTypes = { [type in ItemType]: boolean };
 export type Genres = {[genre: string]: boolean};
-export type UserLogic = 'AND' | 'OR' | 'XOR'
+export type UserLogic = 'AND' | 'OR' | 'XOR';
 
 export interface AppState {
   itemTypes: ItemTypes;
@@ -23,6 +23,9 @@ export interface AppState {
   yAxis: YAxisMode;
   users: User[];
   imdbTable: ImdbTable;
+  reverse: boolean;
+  animate: boolean;
+  bezier: boolean;
 }
 
 export type AppStore = Store<AppState, Action> & {

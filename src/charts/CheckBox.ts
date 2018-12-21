@@ -70,3 +70,39 @@ export class SelectXorRadioButton extends CheckBox {
     });
   }
 }
+
+export class ReverseCheckBox extends CheckBox {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super('Reverse', false);
+    from(store).pipe(distinctUntilKeyChanged('reverse')).subscribe(({reverse}) => {
+      this.checked = reverse;
+    });
+    this.onCheckedChanged(checked => {
+      store.dispatch(actions.setReverse(checked));
+    });
+  }
+}
+
+export class AnimateCheckBox extends CheckBox {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super('Animate', false);
+    from(store).pipe(distinctUntilKeyChanged('animate')).subscribe(({animate}) => {
+      this.checked = animate;
+    });
+    this.onCheckedChanged(checked => {
+      store.dispatch(actions.setAnimate(checked));
+    });
+  }
+}
+
+export class BezierCheckBox extends CheckBox {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super('Bezier', false);
+    from(store).pipe(distinctUntilKeyChanged('bezier')).subscribe(({bezier}) => {
+      this.checked = bezier;
+    });
+    this.onCheckedChanged(checked => {
+      store.dispatch(actions.setBezier(checked));
+    });
+  }
+}
