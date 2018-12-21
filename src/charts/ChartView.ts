@@ -184,10 +184,12 @@ export class ChartView extends View<'div'> {
     for (let i = 0; i < max; i++) {
       if (this._chart.data.datasets[i] && this._data.datasets[i]) {
         Object.assign(this._chart.data.datasets[i], this._data.datasets[i]);
+        this._chart.data.datasets[i].hidden = false;
       } else if (!this._chart.data.datasets[i] && this._data.datasets[i]) {
         this._chart.data.datasets[i] = this._data.datasets[i];
       } else {
         this._chart.data.datasets[i].data = [];
+        this._chart.data.datasets[i].hidden = true;
       }
     }
     this._chart.data.labels = this._data.labels || [];
