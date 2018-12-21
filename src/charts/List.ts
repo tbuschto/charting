@@ -75,7 +75,8 @@ export class YAxisModeList extends List<YAxisMode> {
         {value: 'Distribution', selected: yAxis === 'Distribution'},
         {value: 'Average', selected: yAxis === 'Average'},
         {value: 'Median', selected: yAxis === 'Median'},
-        {value: 'RT', selected: yAxis === 'RT'}
+        {value: 'RT', selected: yAxis === 'RT'},
+        {value: 'Count', selected: yAxis === 'Count'}
       ];
     });
     this.onSelectionChanged(items => {

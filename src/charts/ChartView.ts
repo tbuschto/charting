@@ -62,7 +62,6 @@ const defaultOptions: Chart.ChartOptions = {
     yAxes: [{
       ticks: {
         beginAtZero: true,
-        max: 10,
         fontColor: white,
         padding: 8
       },
@@ -126,6 +125,17 @@ export class ChartView extends View<'div'> {
     return this._title;
   }
 
+  public set max(value) {
+    if (this._max !== value) {
+      this._max = value;
+    }
+    this._update();
+  }
+
+  public get max() {
+    return this._max;
+  }
+
   private _update() {
     // Collect updates, also ensures parent is in DOM
     if (!this._updatePending) {
@@ -171,7 +181,7 @@ export class ChartView extends View<'div'> {
       }
     }
     this._chart.data.labels = this._data.labels || [];
-    this._chart.config.options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
+    this._updateOptions(this._chart.config.options);
     this._chart.update(allowAnimation ? 500 : 0);
   }
 
@@ -190,16 +200,15 @@ export class ChartView extends View<'div'> {
       if (el && el[0] && typeof el[0]._datasetIndex === 'number'&& typeof el[0]._index === 'number') {
         const dataset = this._chart.data.datasets[el[0]._datasetIndex];
         if (dataset.data[el[0]._index] instanceof Object) {
-          alert((dataset.data[el[0]._index] as any).message);
+          alert((dataset.data[el[0]._index] as any).message );
         }
       }
     };
-    options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
     this._chart = new Chart(
       this._canvas.element.getContext('2d') as CanvasRenderingContext2D,
       {
         type: this._type,
-        options: options,
+        options: this._updateOptions(options),
         data: this._data
       }
     );
@@ -212,6 +221,16 @@ export class ChartView extends View<'div'> {
       this._canvas.element.remove();
       this._canvas = null;
     }
+  }
+
+  private _updateOptions(options: Chart.ChartOptions) {
+    options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
+    if (this._max !== undefined) {
+      options.scales.yAxes[0].ticks.max = this._max;
+    } else {
+      delete options.scales.yAxes[0].ticks.max;
+    }
+    return options;
   }
 
 }
@@ -228,6 +247,7 @@ export class ImdbChart extends ChartView {
       this.title = `${Object.keys(state.imdbTable).length} Titles`;
       this.data = converter.convert(state);
       this.type = getChartType(state);
+      this.max = state.yAxis === 'Count' ? undefined : 10;
     });
   }
 

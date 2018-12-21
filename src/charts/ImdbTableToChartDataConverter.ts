@@ -30,6 +30,9 @@ export class ImdbTableToChartDataConverter {
     if (state.yAxis === 'Distribution') {
       return this.getAllRatings(categories, user, state);
     }
+    if (state.yAxis === 'Count') {
+      return this.getTitleCount(categories, user, state);
+    }
     return this.getAccumulatedRatings(categories, user, state);
   }
 
@@ -72,6 +75,19 @@ export class ImdbTableToChartDataConverter {
       hoverBorderColor: 'white',
       lineTension: 0.33,
       data
+    };
+  }
+
+  private getTitleCount(categories: Categories, user: User, state: AppState): Chart.ChartDataSets {
+    const rgb = `rgb(${user.color.join(', ')})`;
+    return {
+      label: user.name,
+      backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
+      borderColor: rgb,
+      hoverRadius: 0,
+      hoverBorderColor: 'white',
+      lineTension: 0.33,
+      data: categories.map(cat => itemsToRatings(cat.items, user).length)
     };
   }
 
