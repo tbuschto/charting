@@ -1,7 +1,7 @@
-import { ImdbTable, ImdbTableFactory, ItemType } from './ImdbTableFactory';
+import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
 import { TextFile } from './FilePicker';
 import { ThunkAction } from 'redux-thunk';
-import { AppState, XAxisMode, YAxisMode, ItemTypes } from './App';
+import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic } from './App';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -10,7 +10,8 @@ export enum ActionType {
   ClearTableData = 'CLEAR_TABLE_DATA',
   SetXAxisMode = 'SET_X_AXIS_MODE',
   SetYAxisMode = 'SET_Y_AXIS_MODE',
-  SetItemTypes = 'SET_ITEM_TYPES'
+  SetItemTypes = 'SET_ITEM_TYPES',
+  SetUserLogic = 'SET_USER_LOGIC'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -22,8 +23,15 @@ type ClearTableData = ActionBase<typeof ActionType.ClearTableData>;
 type SetXAxisMode = ActionBase<typeof ActionType.SetXAxisMode, XAxisMode>;
 type SetYAxisMode = ActionBase<typeof ActionType.SetYAxisMode, YAxisMode>;
 type SetItemTypes = ActionBase<typeof ActionType.SetItemTypes, ItemTypes>;
+type SetUserLogic = ActionBase<typeof ActionType.SetUserLogic, UserLogic>;
 
-export type Action = AddTableData | ShowUserRatings | ClearTableData | SetXAxisMode | SetYAxisMode | SetItemTypes;
+export type Action = AddTableData
+  | ShowUserRatings
+  | ClearTableData
+  | SetXAxisMode
+  | SetYAxisMode
+  | SetItemTypes
+  | SetUserLogic;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -64,6 +72,10 @@ export class ActionCreators {
 
   public setItemTypes(payload: ItemTypes): SetItemTypes {
     return {type: ActionType.SetItemTypes, payload};
+  }
+
+  public setUserLogic(payload: UserLogic): SetUserLogic {
+    return {type: ActionType.SetUserLogic, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

@@ -20,6 +20,7 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
     xAxis: 'Years',
     yAxis: 'Distribution',
     users: [],
+    userLogic: 'OR',
     imdbTable: {},
     genres: {},
     itemTypes: {

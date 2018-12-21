@@ -91,6 +91,7 @@ export class ChartView extends View<'div'> {
   private _updatePending: boolean = false;
   private _data: Chart.ChartData = {};
   private _max: number = 10;
+  private _placeHolder: View = new View('h1').append('No Data');
 
 
   constructor() {
@@ -142,7 +143,6 @@ export class ChartView extends View<'div'> {
     if (!this._updatePending) {
       setTimeout(() => {
         this._updateChart();
-        this._updateTitle();
         this._updatePending = false;
       }, 100);
       this._updatePending = true;
@@ -186,13 +186,8 @@ export class ChartView extends View<'div'> {
     this._chart.update(allowAnimation ? 500 : 0);
   }
 
-  private _updateTitle() {
-    if (this._chart) {
-      this._chart.config.options.title.text = this.title;
-    }
-  }
-
   private _create() {
+    this._placeHolder.element.remove();
     this._canvas = new View('canvas', {id: 'chart'});
     this.append(this._canvas);
     const options = clone(defaultOptions);
@@ -221,11 +216,13 @@ export class ChartView extends View<'div'> {
       this._chart = null;
       this._canvas.element.remove();
       this._canvas = null;
+      this.append(this._placeHolder);
     }
   }
 
   private _updateOptions(options: Chart.ChartOptions) {
     options.scales.xAxes[0].ticks.max = this._data.labels.length - 1;
+    options.title.text = this._title;
     if (this._max !== undefined) {
       options.scales.yAxes[0].ticks.max = this._max;
     } else {

@@ -89,7 +89,7 @@ export class YAxisModeList extends List<YAxisMode> {
 
 export class ItemTypeList extends List<ItemType> {
   constructor(store: AppStore, actions: ActionCreators) {
-    super(4, false);
+    super(4, true);
     from(store).pipe(distinctUntilKeyChanged('itemTypes')).subscribe(({itemTypes}) => {
       this.items = [
         {value: 'movie', selected: itemTypes.movie},

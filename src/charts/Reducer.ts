@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux';
-import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes} from './App';
+import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes, UserLogic} from './App';
 import {ActionType, Action} from './ActionCreators';
 import {ImdbTable, ItemType} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
@@ -19,7 +19,7 @@ const USER_IMDb: User = {
 export class Reducer {
 
   public readonly chartsApp = combineReducers<AppState, Action>(
-    {imdbTable, users, xAxis, yAxis, itemTypes, genres}
+    {imdbTable, users, userLogic, xAxis, yAxis, itemTypes, genres}
   );
 
 }
@@ -64,6 +64,13 @@ function itemTypes(state: ItemTypes, action: Action): ItemTypes {
 
 function genres(state: {[genre: string]: boolean}) {
   return {};
+}
+
+function userLogic(state: UserLogic, action: Action): UserLogic {
+  if (action.type === ActionType.SetUserLogic) {
+    return action.payload;
+  }
+  return state || 'OR';
 }
 
 function users(state: User[], action: Action): User[] {
