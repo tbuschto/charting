@@ -1,5 +1,5 @@
 import { View } from './View';
-import { AppStore, XAxisMode, YAxisMode, AppState } from './App';
+import { AppStore, XAxisMode, YAxisMode, AppState, Genres } from './App';
 import { ActionCreators } from './ActionCreators';
 import { from } from 'rxjs';
 import { distinctUntilKeyChanged } from 'rxjs/operators';
@@ -109,6 +109,24 @@ export class ItemTypeList extends List<ItemType> {
         videoGame: items[4].selected,
         tvMiniSeries: items[5].selected
       }));
+    });
+  }
+}
+
+export class GenreList extends List<string> {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super(4, true);
+    from(store).pipe(distinctUntilKeyChanged('genres')).subscribe(({genres}) => {
+      this.items = Object.keys(genres).sort().map(genre => {
+        return {value: genre, selected: genres[genre]};
+      });
+    });
+    this.onSelectionChanged(items => {
+      const genres: Genres = {};
+      items.forEach(item => {
+        genres[item.value] = item.selected;
+      })
+      store.dispatch(actions.setGenres(genres));
     });
   }
 }

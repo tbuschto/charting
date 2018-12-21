@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes, UserLogic} from './App';
 import {ActionType, Action} from './ActionCreators';
-import {ImdbTable, ItemType} from './ImdbTableFactory';
+import {ImdbTable} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
 
 const COLOR_GENERIC: Color = [2, 172, 211];
@@ -62,8 +62,23 @@ function itemTypes(state: ItemTypes, action: Action): ItemTypes {
   }
 }
 
-function genres(state: {[genre: string]: boolean}) {
-  return {};
+function genres(state: {[genre: string]: boolean}, action: Action): {[genre: string]: boolean} {
+  if (action.type === ActionType.ClearTableData) {
+    return {};
+  }
+  if (action.type === ActionType.SetGenres) {
+    return action.payload;
+  }
+  if (action.type === ActionType.AddTableData) {
+    const newGenre: {[genre: string]: boolean} = {};
+    for (const id in action.payload.data) {
+      action.payload.data[id].genre.forEach(genre => {
+        newGenre[genre] = true;
+      })
+    }
+    return Object.assign({}, state || {}, newGenre);
+  }
+  return state || {};
 }
 
 function userLogic(state: UserLogic, action: Action): UserLogic {

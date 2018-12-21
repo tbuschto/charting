@@ -4,7 +4,7 @@ import { AppStore } from './App';
 import { ActionCreators } from './ActionCreators';
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import { ClearTableButton } from './Button';
-import { DataSetSelectionList, XAxisModeList, YAxisModeList, ItemTypeList } from './List';
+import { DataSetSelectionList, XAxisModeList, YAxisModeList, ItemTypeList, GenreList } from './List';
 import { ImdbItemFilter } from './ImdbItemFilter';
 import { SelectOrRadioButton, SelectAndRadioButton, SelectXorRadioButton, AnimateCheckBox, BezierCheckBox, ReverseCheckBox } from './CheckBox';
 
@@ -38,6 +38,8 @@ export class MainView extends View<'div'> {
         new YAxisModeList(store, actions),
         new View('p').append('Types:'),
         new ItemTypeList(store, actions),
+        new View('p').append('Genres:'),
+        new GenreList(store, actions),
         new ClearTableButton(store, actions)
       )
     )

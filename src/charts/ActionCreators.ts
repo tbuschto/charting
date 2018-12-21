@@ -1,7 +1,7 @@
 import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
 import { TextFile } from './FilePicker';
 import { ThunkAction } from 'redux-thunk';
-import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic } from './App';
+import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic, Genres } from './App';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -14,7 +14,8 @@ export enum ActionType {
   SetUserLogic = 'SET_USER_LOGIC',
   SetReverse = 'SET_REVERSE',
   SetAnimate = 'SET_ANIMATE',
-  SetBezier = 'SET_BEZIER'
+  SetBezier = 'SET_BEZIER',
+  SetGenres = 'SET_GENRES'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -30,6 +31,7 @@ type SetUserLogic = ActionBase<typeof ActionType.SetUserLogic, UserLogic>;
 type SetReverse = ActionBase<typeof ActionType.SetReverse, boolean>;
 type SetAnimate = ActionBase<typeof ActionType.SetAnimate, boolean>;
 type SetBezier = ActionBase<typeof ActionType.SetBezier, boolean>;
+type SetGenres = ActionBase<typeof ActionType.SetGenres, Genres>;
 
 export type Action = AddTableData
   | ShowUserRatings
@@ -40,7 +42,8 @@ export type Action = AddTableData
   | SetUserLogic
   | SetReverse
   | SetAnimate
-  | SetBezier;
+  | SetBezier
+  | SetGenres;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -97,6 +100,10 @@ export class ActionCreators {
 
   public setBezier(payload: boolean): SetBezier {
     return {type: ActionType.SetBezier, payload};
+  }
+
+  public setGenres(payload: Genres): SetGenres {
+    return {type: ActionType.SetGenres, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

@@ -6,7 +6,8 @@ export class ImdbItemFilter {
   filter(items: ImdbItem[], state: AppState): ImdbItem[] {
     return items
       .filter(item => state.itemTypes[item.type])
-      .filter(item => this._userFilter(item, state));
+      .filter(item => this._userFilter(item, state))
+      .filter(item => item.genre.some(genre => state.genres[genre]));
   }
 
   private _userFilter(item: ImdbItem, state: AppState) {
