@@ -168,10 +168,6 @@ export class ChartView extends View<'div'> {
       this._clean();
       this._create();
     }
-    if (!this._data.datasets.length && this._chart) {
-      this._clean();
-      return;
-    }
     if (!this._chart && this._data.datasets.length) {
       this._create();
       return;

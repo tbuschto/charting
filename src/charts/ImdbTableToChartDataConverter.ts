@@ -12,15 +12,13 @@ export class ImdbTableToChartDataConverter {
   public convert(items: ImdbItem[], state: AppState): Chart.ChartData {
     const result: Chart.ChartData = {datasets: [], labels: []};
     const users = state.reverse ? state.users.concat().reverse() : state.users;
-    if (items.length) {
-      users.forEach(user => {
-        if (user.show) {
-          const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
-          result.datasets.push(this.getDataSet(categories, user, state, items));
-          result.labels = categories.map(cat => cat.name);
-        }
-      })
-    }
+    users.forEach(user => {
+      if (user.show) {
+        const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
+        result.datasets.push(this.getDataSet(categories, user, state, items));
+        result.labels = categories.map(cat => cat.name);
+      }
+    })
     return result;
   }
 
@@ -97,7 +95,11 @@ export class ImdbTableToChartDataConverter {
     items: ImdbItem[]
   ): Chart.ChartDataSets {
     const rgb = `rgb(${user.color.join(', ')})`;
-    const factor = 100 / itemsToRatings(items, user).length;
+    let factor = 100 / itemsToRatings(items, user).length;
+    if (!isFinite(factor)) {
+      factor = 0;
+    }
+    console.log(factor);
     return {
       label: user.name,
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
