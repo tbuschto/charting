@@ -247,7 +247,10 @@ export class ImdbChart extends ChartView {
       this.title = `${Object.keys(state.imdbTable).length} Titles`;
       this.data = converter.convert(state);
       this.type = getChartType(state);
-      this.max = state.yAxis === 'Count' ? undefined : 10;
+      this.max =
+          state.yAxis === 'Count' ? undefined
+        : state.yAxis === 'Percent' ? undefined
+        : 10;
     });
   }
 

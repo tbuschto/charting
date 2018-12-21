@@ -18,7 +18,7 @@ export class ImdbTableToChartDataConverter {
       state.users.forEach(user => {
         if (user.show) {
           const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
-          result.datasets.push(this.getDataSet(categories, user, state));
+          result.datasets.push(this.getDataSet(categories, user, state, items));
           result.labels = categories.map(cat => cat.name);
         }
       })
@@ -26,12 +26,15 @@ export class ImdbTableToChartDataConverter {
     return result;
   }
 
-  private getDataSet(categories: Categories, user: User, state: AppState): Chart.ChartDataSets {
+  private getDataSet(categories: Categories, user: User, state: AppState, items: ImdbItem[]): Chart.ChartDataSets {
     if (state.yAxis === 'Distribution') {
       return this.getAllRatings(categories, user, state);
     }
     if (state.yAxis === 'Count') {
       return this.getTitleCount(categories, user, state);
+    }
+    if (state.yAxis === 'Percent') {
+      return this.getTitlesPercent(categories, user, state, items);
     }
     return this.getAccumulatedRatings(categories, user, state);
   }
@@ -71,7 +74,6 @@ export class ImdbTableToChartDataConverter {
       label: user.name,
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
       borderColor: rgb,
-      hoverRadius: 0,
       hoverBorderColor: 'white',
       lineTension: 0.33,
       data
@@ -84,10 +86,27 @@ export class ImdbTableToChartDataConverter {
       label: user.name,
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
       borderColor: rgb,
-      hoverRadius: 0,
       hoverBorderColor: 'white',
       lineTension: 0.33,
       data: categories.map(cat => itemsToRatings(cat.items, user).length)
+    };
+  }
+
+  private getTitlesPercent(
+    categories: Categories,
+    user: User,
+    state: AppState,
+    items: ImdbItem[]
+  ): Chart.ChartDataSets {
+    const rgb = `rgb(${user.color.join(', ')})`;
+    const factor = 100 / itemsToRatings(items, user).length;
+    return {
+      label: user.name,
+      backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
+      borderColor: rgb,
+      hoverBorderColor: 'white',
+      lineTension: 0.33,
+      data: categories.map(cat => roundTo(factor * itemsToRatings(cat.items, user).length, 2))
     };
   }
 
@@ -198,7 +217,7 @@ function roundTo(value: number, points: number) {
   if (typeof value !== 'number') {
     return undefined;
   }
-  const factor = 10^points;
+  const factor = Math.pow(10, points);
   return Math.round(value * factor) / factor;
 }
 
