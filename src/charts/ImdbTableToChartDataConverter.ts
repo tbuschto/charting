@@ -1,4 +1,4 @@
-import { AppState, User, YAxisMode } from './App';
+import { AppState, User, YAxisMode, Genres } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 
 type Category = {name: string, items: ImdbItem[]};
@@ -145,6 +145,9 @@ export class ImdbTableToChartDataConverter {
   }
 
   private groupByCategory(items: ImdbItem[], user: User, state: AppState): Categories {
+    if (state.xAxis ===  'Genre') {
+      return this.groupByGenre(items, state);
+    }
     if (state.xAxis ===  'Rating') {
       return this.groupByRating(items, user.name);
     }
@@ -206,6 +209,27 @@ export class ImdbTableToChartDataConverter {
         result[rating - 1].items.push(item);
       }
     });
+    return result;
+  }
+
+  private groupByGenre(items: ImdbItem[], state: AppState): Categories {
+    const unsort: {[genre: string]: ImdbItem[]} = {};
+    items.forEach(item => {
+      item.genre.forEach(genre => {
+        if (state.genres[genre]) {
+          const genreItems = unsort[genre] = unsort[genre] || [];
+          genreItems.push(item);
+        }
+      });
+    });
+    const result = Object.keys(state.genres)
+      .filter(genre => state.genres[genre])
+      .sort()
+      .map(genre => ({name: genre, items: unsort[genre] || []}));
+    if (state.yAxis === 'Distribution') {
+      result.push({name: '', items: []});
+      result.unshift({name: '', items: []});
+    }
     return result;
   }
 

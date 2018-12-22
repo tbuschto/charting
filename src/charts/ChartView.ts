@@ -56,9 +56,7 @@ const defaultOptions: Chart.ChartOptions = {
         },
         fontColor: white,
         padding: 8,
-        min: 0,
-        maxTicksLimit: 10,
-        maxRotation: 0
+        min: 0
       }
     }],
     yAxes: [{
@@ -94,6 +92,7 @@ export class ChartView extends View<'div'> {
   private _max: number = 10;
   private _placeHolder: View = new View('h1').append('No Data');
   private _animate: boolean = true;
+  private _showAllXValues = true;
 
   constructor() {
     super('div', {id: 'chartwrapper'}, {
@@ -145,6 +144,17 @@ export class ChartView extends View<'div'> {
 
   public get animate() {
     return this._animate;
+  }
+
+  public set showAllXValues(value: boolean) {
+    if (this._showAllXValues !== value) {
+      this._showAllXValues = value;
+      this._update();
+    }
+  }
+
+  public get showAllXValues() {
+    return this._showAllXValues;
   }
 
   private _update() {
@@ -236,6 +246,18 @@ export class ChartView extends View<'div'> {
     } else {
       delete options.scales.yAxes[0].ticks.max;
     }
+    const ticks = options.scales.xAxes[0].ticks;
+    if (this._showAllXValues) {
+      ticks.stepSize = 1;
+      ticks.autoSkip = false,
+      delete ticks.maxRotation;
+      delete ticks.maxTicksLimit;
+    } else {
+      delete ticks.stepSize;
+      delete ticks.autoSkip;
+      ticks.maxRotation = 0;
+      ticks.maxTicksLimit = 10;
+    }
     return options;
   }
 
@@ -257,6 +279,7 @@ export class ImdbChart extends ChartView {
       this.data = converter.convert(items, state);
       this.animate = state.animate;
       this.type = getChartType(state);
+      this.showAllXValues = state.xAxis !== 'Years';
       this.max =
           state.yAxis === 'Count' ? undefined
         : state.yAxis === 'Percent' ? 100

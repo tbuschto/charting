@@ -1,5 +1,5 @@
 import { View } from './View';
-import { AppStore, XAxisMode, YAxisMode, AppState, Genres } from './App';
+import { AppStore, XAxisMode, YAxisMode, Genres } from './App';
 import { ActionCreators } from './ActionCreators';
 import { from } from 'rxjs';
 import { distinctUntilKeyChanged } from 'rxjs/operators';
@@ -60,7 +60,8 @@ export class XAxisModeList extends List<XAxisMode> {
       this.items = [
         {value: 'Years', selected: xAxis === 'Years'},
         {value: 'Decades', selected: xAxis === 'Decades'},
-        {value: 'Rating', selected: xAxis === 'Rating'}
+        {value: 'Rating', selected: xAxis === 'Rating'},
+        {value: 'Genre', selected: xAxis === 'Genre'}
       ];
     });
     this.onSelectionChanged(items => {
