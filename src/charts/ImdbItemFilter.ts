@@ -7,7 +7,26 @@ export class ImdbItemFilter {
     return items
       .filter(item => state.itemTypes[item.type])
       .filter(item => this._userFilter(item, state))
+      .filter(item => this._releaseFilter(item, state))
+      .filter(item => this._ratingsFilter(item, state))
       .filter(item => item.genre.some(genre => state.genres[genre]));
+  }
+
+  private _releaseFilter(item: ImdbItem, state: AppState) {
+    const year = yearOf(item.release);
+    return year >= state.years[0] && year <= state.years[1];
+  }
+
+  private _ratingsFilter(item: ImdbItem, state: AppState) {
+    const users = state.users.filter(user => user.show).map(user => user.name);
+    const ratings = item.ratings;
+    const range = state.ratings;
+    for (const user of users) {
+      if ((user in ratings) && (ratings[user] <= range[1]) && (ratings[user] >= range[0])) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private _userFilter(item: ImdbItem, state: AppState) {
@@ -25,4 +44,8 @@ export class ImdbItemFilter {
     return users.some(user => user in item.ratings);
   }
 
+}
+
+function yearOf(date: string): number {
+  return new Date(date).getFullYear()
 }

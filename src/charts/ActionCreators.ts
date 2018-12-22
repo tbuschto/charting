@@ -16,7 +16,9 @@ export enum ActionType {
   SetReverse = 'SET_REVERSE',
   SetAnimate = 'SET_ANIMATE',
   SetBezier = 'SET_BEZIER',
-  SetGenres = 'SET_GENRES'
+  SetGenres = 'SET_GENRES',
+  SetYears = 'SET_YEARS',
+  SetRatings = 'SET_RATINGS'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -33,6 +35,8 @@ type SetReverse = ActionBase<typeof ActionType.SetReverse, boolean>;
 type SetAnimate = ActionBase<typeof ActionType.SetAnimate, boolean>;
 type SetBezier = ActionBase<typeof ActionType.SetBezier, boolean>;
 type SetGenres = ActionBase<typeof ActionType.SetGenres, Genres>;
+type SetYears = ActionBase<typeof ActionType.SetYears, [number, number]>;
+type SetRatings = ActionBase<typeof ActionType.SetRatings, [number, number]>;
 
 export type Action = AddTableData
   | ShowUserRatings
@@ -44,7 +48,9 @@ export type Action = AddTableData
   | SetReverse
   | SetAnimate
   | SetBezier
-  | SetGenres;
+  | SetGenres
+  | SetYears
+  | SetRatings;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -117,6 +123,14 @@ export class ActionCreators {
 
   public setGenres(payload: Genres): SetGenres {
     return {type: ActionType.SetGenres, payload};
+  }
+
+  public setYears(payload: [number, number]): SetYears {
+    return {type: ActionType.SetYears, payload};
+  }
+
+  public setRatings(payload: [number, number]): SetRatings {
+    return {type: ActionType.SetRatings, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

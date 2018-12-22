@@ -3,6 +3,7 @@ import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes, UserLogic} from 
 import {ActionType, Action} from './ActionCreators';
 import {ImdbTable} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
+import { YEAR_MIN, YEAR_MAX } from './ImdbTableToChartDataConverter';
 
 const COLOR_GENERIC: Color = [2, 172, 211];
 const COLORS: Color[] = [
@@ -19,7 +20,10 @@ const USER_IMDb: User = {
 export class Reducer {
 
   public readonly chartsApp = combineReducers<AppState, Action>(
-    {imdbTable, users, userLogic, xAxis, yAxis, itemTypes, genres, reverse, animate, bezier}
+    {
+      imdbTable, users, userLogic, xAxis, yAxis, years, ratings,
+      itemTypes, genres, reverse, animate, bezier
+    }
   );
 
 }
@@ -107,6 +111,32 @@ function bezier(state: boolean, action: Action): boolean {
     return action.payload;
   }
   return state === undefined ? true : state;
+}
+
+function years(state: [number, number], action: Action): [number, number] {
+  let result = state ? state.concat() : [YEAR_MIN, YEAR_MAX];
+  if (action.type === ActionType.SetYears) {
+    result = action.payload.concat();
+  }
+  result[0] = Math.min(Math.max(result[0], YEAR_MIN), YEAR_MAX);
+  result[1] = Math.min(Math.max(result[1], YEAR_MIN), YEAR_MAX);
+  return [
+    Math.min(result[0], result[1]),
+    Math.max(result[0], result[1])
+  ];
+}
+
+function ratings(state: [number, number], action: Action): [number, number] {
+  let result = state ? state.concat() : [1, 10];
+  if (action.type === ActionType.SetRatings) {
+    result = action.payload.concat();
+  }
+  result[0] = Math.min(Math.max(result[0], 0), 10);
+  result[1] = Math.min(Math.max(result[1], 0), 10);
+  return [
+    Math.min(result[0], result[1]),
+    Math.max(result[0], result[1])
+  ];
 }
 
 function users(state: User[], action: Action): User[] {

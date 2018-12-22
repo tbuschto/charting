@@ -7,7 +7,7 @@ import { ActionCreators } from './charts/ActionCreators';
 import { createLogger } from 'redux-logger';
 import { MainView } from './charts/MainView';
 import { Persistence } from './charts/Persistence';
-import { ImdbTableToChartDataConverter } from './charts/ImdbTableToChartDataConverter';
+import { ImdbTableToChartDataConverter, YEAR_MIN, YEAR_MAX } from './charts/ImdbTableToChartDataConverter';
 import * as freeze from 'redux-freeze';
 import reduxThunk from 'redux-thunk';
 import { ImdbItemFilter } from './charts/ImdbItemFilter';
@@ -26,6 +26,8 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
     reverse: false,
     animate: true,
     bezier: true,
+    years: [YEAR_MIN, YEAR_MAX],
+    ratings: [1, 10],
     itemTypes: {
       movie: true,
       tvMiniSeries: false,

@@ -16,6 +16,7 @@
     "chart.js": "^2.7.3",
     "clone": "^2.1.2",
     "deep-extend": "^0.6.0",
+    "paper-range-slider": "^3.0.0",
     "redux": "^4.0.1",
     "redux-freeze": "^0.1.7",
     "redux-logger": "^3.0.6",

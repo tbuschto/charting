@@ -22,11 +22,16 @@ export interface AppState {
   xAxis: XAxisMode;
   yAxis: YAxisMode;
   users: User[];
+  years: [number, number];
+  ratings: [number, number];
   imdbTable: ImdbTable;
   reverse: boolean;
   animate: boolean;
   bezier: boolean;
 }
+
+const YEAR_MIN = 1920;
+const YEAR_MAX = 2020;
 
 export type AppStore = Store<AppState, Action> & {
   dispatch<R>(asyncAction: AsyncAction<R>): R
