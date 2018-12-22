@@ -19,12 +19,23 @@ export class List<T extends string = string> extends View<'select'> {
   }
 
   public set items(items: Item<T>[]) {
-    while (this.element.firstChild) {
-      this.element.firstChild.remove();
-    }
-    items.forEach(item => {
-      this.append(new View('option', item).append(item.value));
+    const options: HTMLOptionElement[] = [];
+    this.element.childNodes.forEach(node => {
+      if (node instanceof HTMLOptionElement) {
+        options.push(node);
+      }
     });
+    for (let i = 0; i < Math.max(items.length, options.length); i++) {
+      if (items[i] && options[i]) {
+        options[i].value = items[i].value;
+        options[i].selected = items[i].selected;
+        options[i].innerText = items[i].value;
+      } else if (items[i] && !options[i]) {
+        this.append(new View('option', items[i]).append(items[i].value));
+      } else {
+        options[i].remove();
+      }
+    }
   }
 
   public get items() {
