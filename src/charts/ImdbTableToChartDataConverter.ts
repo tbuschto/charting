@@ -14,7 +14,7 @@ export class ImdbTableToChartDataConverter {
     const users = state.reverse ? state.users.concat().reverse() : state.users;
     users.forEach(user => {
       if (user.show) {
-        const categories = this.groupByCategory(state.xAxis, state.yAxis, items);
+        const categories = this.groupByCategory(state.xAxis, state.yAxis, items, user);
         result.datasets.push(this.getDataSet(categories, user, state, items));
         result.labels = categories.map(cat => cat.name);
       }
@@ -39,16 +39,18 @@ export class ImdbTableToChartDataConverter {
     const data: Chart.ChartPoint[] = [];
     const xAxis = state.xAxis;
     categories.forEach((cat, i) => {
-      const ratings = this.groupByRating(cat.items, user.name);
-      for(let rating in ratings) {
+      this.groupByRating(cat.items, user.name).forEach(rating => {
+        if (!rating.items.length) {
+          return;
+        }
         data.push({
-          label: this.getLabel(cat.name, ratings[rating]),
-          message: this.getMessage(cat.name, ratings[rating]),
+          label: this.getLabel(cat.name, rating.items),
+          message: this.getMessage(cat.name, rating.items),
           x: i,
-          y: parseInt(rating),
-          r: Math.round(ratings[rating].length / (xAxis === 'Decades' ? 8 : 2)) + 3
+          y: parseInt(rating.name),
+          r: Math.round(rating.items.length / (xAxis === 'Decades' ? 8 : 2)) + 3
         });
-      }
+      });
     });
     return {
       label: user.name,
@@ -99,7 +101,6 @@ export class ImdbTableToChartDataConverter {
     if (!isFinite(factor)) {
       factor = 0;
     }
-    console.log(factor);
     return {
       label: user.name,
       backgroundColor: state.xAxis === 'Years' ? 'transparent' : rgb,
@@ -143,7 +144,10 @@ export class ImdbTableToChartDataConverter {
     return items.map(item => item.title).join('\n');
   }
 
-  private groupByCategory(xAxis: XAxisMode, yAxis: YAxisMode, items: ImdbItem[]): Categories {
+  private groupByCategory(xAxis: XAxisMode, yAxis: YAxisMode, items: ImdbItem[], user: User): Categories {
+    if (xAxis ===  'Rating') {
+      return this.groupByRating(items, user.name)
+    }
     if (xAxis === 'Decades') {
       return this.groupByDecade(items, yAxis);
     }
@@ -190,17 +194,18 @@ export class ImdbTableToChartDataConverter {
     return result;
   }
 
-
-  private groupByRating(items: ImdbItem[], ratingName: string): {[key: string]: ImdbItem[]} {
-    const ratings: {[key: string]: ImdbItem[]} = {};
+  private groupByRating(items: ImdbItem[], ratingName: string): Categories {
+    const result: Categories = [];
+    for (let i = 0; i <= 10; i++) {
+      result.push({name: i + '', items: []});
+    }
     items.forEach(item => {
-      const rating = Math.round(item.ratings[ratingName]);
-      if (!ratings[rating]) {
-        ratings[rating] = [];
+      if (ratingName in item.ratings) {
+        const rating = Math.round(item.ratings[ratingName]);
+        result[rating].items.push(item);
       }
-      ratings[rating].push(item);
     });
-    return ratings;
+    return result;
   }
 
 }

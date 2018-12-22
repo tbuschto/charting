@@ -2,6 +2,7 @@ import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
 import { TextFile } from './FilePicker';
 import { ThunkAction } from 'redux-thunk';
 import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic, Genres } from './App';
+import { dispatch } from 'rxjs/internal/observable/range';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -74,12 +75,24 @@ export class ActionCreators {
     }
   }
 
-  public setXAxisMode(payload: XAxisMode): SetXAxisMode {
-    return {type: ActionType.SetXAxisMode, payload};
+  public setXAxisMode(payload: XAxisMode): AsyncAction {
+    return (dispatch, getState) => {
+      const state = getState();
+      if (payload === 'Rating' && state.yAxis !== 'Percent' && state.yAxis !== 'Count') {
+        dispatch({type: ActionType.SetYAxisMode, payload: 'Count'});
+      }
+      dispatch({type: ActionType.SetXAxisMode, payload});
+    };
   }
 
-  public setYAxisMode(payload: YAxisMode): SetYAxisMode {
-    return {type: ActionType.SetYAxisMode, payload};
+  public setYAxisMode(payload: YAxisMode): AsyncAction {
+    return (dispatch, getState) => {
+      const state = getState();
+      dispatch({type: ActionType.SetYAxisMode, payload});
+      if (state.xAxis === 'Rating' && payload !== 'Percent' && payload !== 'Count') {
+        dispatch({type: ActionType.SetYAxisMode, payload: state.yAxis});
+      }
+    };
   }
 
   public setItemTypes(payload: ItemTypes): SetItemTypes {
