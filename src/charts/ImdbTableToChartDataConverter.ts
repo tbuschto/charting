@@ -1,4 +1,4 @@
-import { AppState, XAxisMode, User, YAxisMode } from './App';
+import { AppState, User, YAxisMode } from './App';
 import { ImdbItem } from './ImdbTableFactory';
 
 type Category = {name: string, items: ImdbItem[]};
@@ -14,7 +14,7 @@ export class ImdbTableToChartDataConverter {
     const users = state.reverse ? state.users.concat().reverse() : state.users;
     users.forEach(user => {
       if (user.show) {
-        const categories = this.groupByCategory(state.xAxis, state.yAxis, items, user);
+        const categories = this.groupByCategory(items, user, state);
         result.datasets.push(this.getDataSet(categories, user, state, items));
         result.labels = categories.map(cat => cat.name);
       }
@@ -144,17 +144,17 @@ export class ImdbTableToChartDataConverter {
     return items.map(item => item.title).join('\n');
   }
 
-  private groupByCategory(xAxis: XAxisMode, yAxis: YAxisMode, items: ImdbItem[], user: User): Categories {
-    if (xAxis ===  'Rating') {
-      return this.groupByRating(items, user.name)
+  private groupByCategory(items: ImdbItem[], user: User, state: AppState): Categories {
+    if (state.xAxis ===  'Rating') {
+      return this.groupByRating(items, user.name);
     }
-    if (xAxis === 'Decades') {
-      return this.groupByDecade(items, yAxis);
+    if (state.xAxis === 'Decades') {
+      return this.groupByDecade(items, state.yAxis);
     }
-    return this.groupByYear(items);
+    return this.groupByYear(items, state);
   }
 
-  private groupByYear(items: ImdbItem[]): Categories {
+  private groupByYear(items: ImdbItem[], state: AppState): Categories {
     const unsort: {[year: number]: ImdbItem[]} = {};
     items.forEach(item => {
       const year = yearOf(item.release);
@@ -166,8 +166,9 @@ export class ImdbTableToChartDataConverter {
       items.push(item);
     });
     const result: Categories = [];
-    for (let i = YEAR_MIN; i <= YEAR_MAX; i++) {
-      result[i - YEAR_MIN] = {name: i + '', items: unsort[i] || []};
+    const [yearMin, yearMax] = state.years;
+    for (let i = yearMin; i <= yearMax; i++) {
+      result[i - yearMin] = {name: i + '', items: unsort[i] || []};
     }
     return result;
   }
@@ -196,13 +197,13 @@ export class ImdbTableToChartDataConverter {
 
   private groupByRating(items: ImdbItem[], ratingName: string): Categories {
     const result: Categories = [];
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 1; i <= 10; i++) {
       result.push({name: i + '', items: []});
     }
     items.forEach(item => {
       if (ratingName in item.ratings) {
         const rating = Math.round(item.ratings[ratingName]);
-        result[rating].items.push(item);
+        result[rating - 1].items.push(item);
       }
     });
     return result;
