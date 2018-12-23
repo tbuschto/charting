@@ -21,6 +21,8 @@ const defaultOptions: Chart.ChartOptions = {
   },
   animation: {},
   tooltips: {
+    intersect: false,
+    mode: 'nearest',
     callbacks: {
       label: (tooltip, data) => {
         const dataSet = data.datasets[tooltip.datasetIndex];
