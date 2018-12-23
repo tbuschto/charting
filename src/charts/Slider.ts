@@ -89,14 +89,14 @@ export class YearsSlider extends Slider {
 export class RatingsSlider extends Slider {
   constructor(store: AppStore, actions: ActionCreators) {
     super();
-    this.diffMin = 0;
+    this.diffMin = 4;
     this.min = 1;
-    this.max = 10;
+    this.max = 14;
     from(store).pipe(distinctUntilKeyChanged('ratings')).subscribe(({ratings}) => {
-      this.range = ratings;
+      this.range = [ratings[0], ratings[1] + 4];
     });
     this.onRangeChanged(range => {
-      store.dispatch(actions.setRatings(range));
+      store.dispatch(actions.setRatings([range[0], range[1] - 4]));
     })
   }
 }
