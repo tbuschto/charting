@@ -48,7 +48,7 @@ export class ImdbTableToChartDataConverter {
           message: this.getMessage(cat.name, rating.items),
           x: i,
           y: parseInt(rating.name),
-          r: Math.round(rating.items.length / (xAxis === 'Decades' ? 8 : 2)) + 3
+          r: Math.round(rating.items.length / (xAxis === 'Decades' ? 4 : 2)) + 5
         });
       });
     });
