@@ -28,7 +28,9 @@ export class ImdbTableFactory {
     const factory = new ImdbItemFactory(user, rows.shift());
     const table: ImdbTable = {};
     rows.map(row => factory.createItem(row)).forEach(item => {
-      table[item.id] = item;
+      if (!isNaN(item.ratings[user])) {
+        table[item.id] = item;
+      }
     })
     return table;
   }
