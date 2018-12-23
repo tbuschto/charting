@@ -39,7 +39,7 @@ export class ImdbTableToChartDataConverter {
     const data: Chart.ChartPoint[] = [];
     const xAxis = state.xAxis;
     categories.forEach((cat, i) => {
-      this.groupByRating(cat.items, user.name).forEach(rating => {
+      this.groupByRating(cat.items, user.name, state.ratings).forEach(rating => {
         if (!rating.items.length) {
           return;
         }
@@ -141,7 +141,7 @@ export class ImdbTableToChartDataConverter {
   }
 
   private getMessage(category: string, items: ImdbItem[]): string {
-    return items.map(item => item.title).join('\n');
+    return items.map(item => item.title + ': ' +JSON.stringify(item.ratings).replace(/[\{\}\"]/g, '') ).join('\n');
   }
 
   private groupByCategory(items: ImdbItem[], user: User, state: AppState): Categories {
@@ -149,7 +149,7 @@ export class ImdbTableToChartDataConverter {
       return this.groupByGenre(items, state);
     }
     if (state.xAxis ===  'Rating') {
-      return this.groupByRating(items, user.name);
+      return this.groupByRating(items, user.name, state.ratings);
     }
     if (state.xAxis === 'Decades') {
       return this.groupByDecade(items, state.yAxis);
@@ -198,15 +198,21 @@ export class ImdbTableToChartDataConverter {
     return result;
   }
 
-  private groupByRating(items: ImdbItem[], ratingName: string): Categories {
+  private groupByRating(items: ImdbItem[], ratingName: string, range: [number, number]): Categories {
     const result: Categories = [];
     for (let i = 1; i <= 10; i++) {
       result.push({name: i + '', items: []});
     }
     items.forEach(item => {
-      if (ratingName in item.ratings) {
-        const rating = Math.round(item.ratings[ratingName]);
-        result[rating - 1].items.push(item);
+      try {
+        if (ratingName in item.ratings) {
+          const rating = Math.round(item.ratings[ratingName]);
+          if (rating <= range[1] && rating >= range[0]) {
+            result[rating - 1].items.push(item);
+          }
+        }
+      } catch (ex) {
+        console.warn('Could not read rating', item);
       }
     });
     return result;
