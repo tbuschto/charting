@@ -6,6 +6,7 @@ import { from } from "rxjs";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import * as clone from 'clone';
 import { ImdbItemFilter } from './ImdbItemFilter';
+import { Label } from './Label';
 
 const darkGray = 'rgb(51, 51, 51)'
 const white = 'rgb(220, 220, 220)';
@@ -186,8 +187,9 @@ export class ChartView extends View<'div'> {
     }
     const realDataSetCount = this._chart.data.datasets.filter(dataset => dataset.data.length).length;
     const max = Math.max(this.data.datasets.length, this._chart.data.datasets.length);
-    const allowAnimation = realDataSetCount === 0
-      || this.data.datasets.length === realDataSetCount;
+    const sameLength = this.data.datasets.length;
+    const hasSameLabel = this.data.datasets.some(dataset => dataset.label === this._chart.data.datasets[0].label)
+    const allowAnimation = realDataSetCount === 0 || (sameLength && !hasSameLabel);
     // For animations to work the existing datasets may never be replaced or removed entirely
     for (let i = 0; i < max; i++) {
       if (this._chart.data.datasets[i] && this._data.datasets[i]) {
