@@ -24,16 +24,14 @@ export class ImdbItemFilter {
     for (const user of users) {
      result = result || inRange(item.ratings[user], state.ratings);
     }
-    if (users.length > 1) {
-      result = result && this._getRatingDiffs(users, item.ratings).some(diff => inRange(diff, state.ratingsDiff));
-    }
-    return result;
+    const diffs = this._getRatingDiffs(users, item.ratings);
+    return result && (!diffs.length || diffs.some(diff => inRange(diff, state.ratingsDiff)));
   }
 
   private _getRatingDiffs(users: string[], ratings: {[user: string]: number}): number[] {
     const diffs: number[] = [];
     users.forEach(user1 => users.forEach(user2 => {
-      if (user1 !== user2) {
+      if ((user1 !== user2) && (user1 in ratings) && (user2 in ratings)) {
         diffs.push(Math.abs(Math.round(ratings[user1] - ratings[user2])));
       }
     }));
