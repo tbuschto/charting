@@ -24,7 +24,9 @@ export class ImdbItemFilter {
     for (const user of users) {
      result = result || inRange(item.ratings[user], state.ratings);
     }
-    result = result && this._getRatingDiffs(users, item.ratings).some(diff => inRange(diff, state.ratingsDiff));
+    if (users.length > 1) {
+      result = result && this._getRatingDiffs(users, item.ratings).some(diff => inRange(diff, state.ratingsDiff));
+    }
     return result;
   }
 
@@ -32,7 +34,7 @@ export class ImdbItemFilter {
     const diffs: number[] = [];
     users.forEach(user1 => users.forEach(user2 => {
       if (user1 !== user2) {
-        diffs.push(Math.abs(ratings[user1] - ratings[user2]));
+        diffs.push(Math.abs(Math.round(ratings[user1] - ratings[user2])));
       }
     }));
     return diffs;
