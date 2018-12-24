@@ -1,5 +1,6 @@
 import { ImdbItem } from './ImdbTableFactory';
 import { AppState } from './App';
+import { yearOf, inRange } from './util';
 
 export class ImdbItemFilter {
 
@@ -19,14 +20,22 @@ export class ImdbItemFilter {
 
   private _ratingsFilter(item: ImdbItem, state: AppState) {
     const users = state.users.filter(user => user.show).map(user => user.name);
-    const ratings = item.ratings;
-    const range = state.ratings;
+    let result = false;
     for (const user of users) {
-      if ((user in ratings) && (ratings[user] <= range[1]) && (ratings[user] >= range[0])) {
-        return true;
-      }
+     result = result || inRange(item.ratings[user], state.ratings);
     }
-    return false;
+    result = result && this._getRatingDiffs(users, item.ratings).some(diff => inRange(diff, state.ratingsDiff));
+    return result;
+  }
+
+  private _getRatingDiffs(users: string[], ratings: {[user: string]: number}): number[] {
+    const diffs: number[] = [];
+    users.forEach(user1 => users.forEach(user2 => {
+      if (user1 !== user2) {
+        diffs.push(Math.abs(ratings[user1] - ratings[user2]));
+      }
+    }));
+    return diffs;
   }
 
   private _userFilter(item: ImdbItem, state: AppState) {
@@ -44,8 +53,4 @@ export class ImdbItemFilter {
     return users.some(user => user in item.ratings);
   }
 
-}
-
-function yearOf(date: string): number {
-  return new Date(date).getFullYear()
 }

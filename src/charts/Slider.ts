@@ -100,3 +100,18 @@ export class RatingsSlider extends Slider {
     })
   }
 }
+
+export class RatingsDiffSlider extends Slider {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super();
+    this.diffMin = 4;
+    this.min = 0;
+    this.max = 13;
+    from(store).pipe(distinctUntilKeyChanged('ratingsDiff')).subscribe(({ratingsDiff}) => {
+      this.range = [ratingsDiff[0], ratingsDiff[1] + 4];
+    });
+    this.onRangeChanged(range => {
+      store.dispatch(actions.setRatingsDiff([range[0], range[1] - 4]));
+    })
+  }
+}

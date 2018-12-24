@@ -28,6 +28,7 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
     bezier: true,
     years: [YEAR_MIN, YEAR_MAX],
     ratings: [1, 10],
+    ratingsDiff: [0, 9],
     itemTypes: {
       movie: true,
       tvMiniSeries: false,

@@ -22,7 +22,7 @@ export class Reducer {
   public readonly chartsApp = combineReducers<AppState, Action>(
     {
       imdbTable, users, userLogic, xAxis, yAxis, years, ratings,
-      itemTypes, genres, reverse, animate, bezier
+      ratingsDiff, itemTypes, genres, reverse, animate, bezier
     }
   );
 
@@ -133,6 +133,19 @@ function ratings(state: [number, number], action: Action): [number, number] {
   }
   result[0] = Math.min(Math.max(result[0], 0), 10);
   result[1] = Math.min(Math.max(result[1], 0), 10);
+  return [
+    Math.min(result[0], result[1]),
+    Math.max(result[0], result[1])
+  ];
+}
+
+function ratingsDiff(state: [number, number], action: Action): [number, number] {
+  let result = state ? state.concat() : [1, 10];
+  if (action.type === ActionType.SetRatingsDiff) {
+    result = action.payload.concat();
+  }
+  result[0] = Math.min(Math.max(result[0], 0), 9);
+  result[1] = Math.min(Math.max(result[1], 0), 9);
   return [
     Math.min(result[0], result[1]),
     Math.max(result[0], result[1])

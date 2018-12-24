@@ -38,3 +38,12 @@ export class RatingsLabel extends Label {
     });
   }
 }
+
+export class RatingsDiffLabel extends Label {
+  constructor(store: AppStore, actions: ActionCreators) {
+    super('');
+    from(store).pipe(distinctUntilKeyChanged('ratingsDiff')).subscribe(({ratingsDiff}) => {
+      this.text = `Ratings Difference: ${ratingsDiff[0]} - ${ratingsDiff[1]}`
+    });
+  }
+}

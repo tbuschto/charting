@@ -2,7 +2,6 @@ import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
 import { TextFile } from './FilePicker';
 import { ThunkAction } from 'redux-thunk';
 import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic, Genres } from './App';
-import { dispatch } from 'rxjs/internal/observable/range';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -18,7 +17,8 @@ export enum ActionType {
   SetBezier = 'SET_BEZIER',
   SetGenres = 'SET_GENRES',
   SetYears = 'SET_YEARS',
-  SetRatings = 'SET_RATINGS'
+  SetRatings = 'SET_RATINGS',
+  SetRatingsDiff = 'SET_RATINGS_DIFF'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -37,6 +37,7 @@ type SetBezier = ActionBase<typeof ActionType.SetBezier, boolean>;
 type SetGenres = ActionBase<typeof ActionType.SetGenres, Genres>;
 type SetYears = ActionBase<typeof ActionType.SetYears, [number, number]>;
 type SetRatings = ActionBase<typeof ActionType.SetRatings, [number, number]>;
+type SetRatingsDiff = ActionBase<typeof ActionType.SetRatingsDiff, [number, number]>;
 
 export type Action = AddTableData
   | ShowUserRatings
@@ -50,7 +51,8 @@ export type Action = AddTableData
   | SetBezier
   | SetGenres
   | SetYears
-  | SetRatings;
+  | SetRatings
+  | SetRatingsDiff;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -131,6 +133,10 @@ export class ActionCreators {
 
   public setRatings(payload: [number, number]): SetRatings {
     return {type: ActionType.SetRatings, payload};
+  }
+
+  public setRatingsDiff(payload: [number, number]): SetRatingsDiff {
+    return {type: ActionType.SetRatingsDiff, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

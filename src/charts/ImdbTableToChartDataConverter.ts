@@ -1,5 +1,6 @@
 import { AppState, User, YAxisMode, Genres } from './App';
 import { ImdbItem } from './ImdbTableFactory';
+import { yearOf, inRange } from './util';
 
 type Category = {name: string, items: ImdbItem[]};
 type Categories = Category[];
@@ -207,7 +208,7 @@ export class ImdbTableToChartDataConverter {
       try {
         if (ratingName in item.ratings) {
           const rating = Math.round(item.ratings[ratingName]);
-          if (rating <= range[1] && rating >= range[0]) {
+          if (inRange(rating, range)) {
             result[rating - 1].items.push(item);
           }
         }
@@ -243,10 +244,6 @@ export class ImdbTableToChartDataConverter {
 
 function decadeOf(date: string): number {
   return Math.floor(yearOf(date) / 10) * 10;
-}
-
-function yearOf(date: string): number {
-  return new Date(date).getFullYear()
 }
 
 function roundTo(value: number, points: number) {

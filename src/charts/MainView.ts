@@ -7,8 +7,8 @@ import { ClearTableButton } from './Button';
 import { DataSetSelectionList, XAxisModeList, YAxisModeList, ItemTypeList, GenreList } from './List';
 import { ImdbItemFilter } from './ImdbItemFilter';
 import { SelectOrRadioButton, SelectAndRadioButton, SelectXorRadioButton, AnimateCheckBox, BezierCheckBox, ReverseCheckBox } from './CheckBox';
-import { Slider, YearsSlider, RatingsSlider } from './Slider';
-import { Label, YearsLabel, RatingsLabel } from './Label';
+import { Slider, YearsSlider, RatingsSlider, RatingsDiffSlider } from './Slider';
+import { Label, YearsLabel, RatingsLabel, RatingsDiffLabel } from './Label';
 
 export class MainView extends View<'div'> {
 
@@ -42,6 +42,8 @@ export class MainView extends View<'div'> {
         new YearsSlider(store, actions),
         new RatingsLabel(store, actions),
         new RatingsSlider(store, actions),
+        new RatingsDiffLabel(store, actions),
+        new RatingsDiffSlider(store, actions),
         new Label('Types:'),
         new ItemTypeList(store, actions),
         new Label('Genres:'),

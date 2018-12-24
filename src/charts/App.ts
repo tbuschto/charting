@@ -24,6 +24,7 @@ export interface AppState {
   users: User[];
   years: [number, number];
   ratings: [number, number];
+  ratingsDiff: [number, number];
   imdbTable: ImdbTable;
   reverse: boolean;
   animate: boolean;
