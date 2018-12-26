@@ -1,6 +1,6 @@
 import { Store } from 'redux'
 import { distinctUntilKeyChanged } from 'rxjs/operators'
-import { ImdbTable, ItemType } from './ImdbTableFactory';
+import { ImdbTable, ItemType, ImdbItem } from './ImdbTableFactory';
 import { Action, AsyncAction } from './ActionCreators';
 import { FilePicker } from './FilePicker';
 import { View } from './View';
@@ -29,6 +29,7 @@ export interface AppState {
   reverse: boolean;
   animate: boolean;
   bezier: boolean;
+  tableView: ImdbItem[];
 }
 
 const YEAR_MIN = 1920;

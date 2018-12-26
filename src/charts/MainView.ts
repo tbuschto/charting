@@ -3,7 +3,7 @@ import { ImdbChart } from './ChartView';
 import { AppStore } from './App';
 import { ActionCreators } from './ActionCreators';
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
-import { ClearTableButton } from './Button';
+import { ClearTableButton, ShowDataButton } from './Button';
 import { DataSetSelectionList, XAxisModeList, YAxisModeList, ItemTypeList, GenreList } from './List';
 import { ImdbItemFilter } from './ImdbItemFilter';
 import { SelectOrRadioButton, SelectAndRadioButton, SelectXorRadioButton, AnimateCheckBox, BezierCheckBox, ReverseCheckBox } from './CheckBox';
@@ -48,6 +48,7 @@ export class MainView extends View<'div'> {
         new ItemTypeList(store, actions),
         new Label('Genres:'),
         new GenreList(store, actions),
+        new ShowDataButton(store, actions),
         new ClearTableButton(store, actions)
       )
     )

@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 import {AppState, User, XAxisMode, YAxisMode, Color, ItemTypes, UserLogic} from './App';
 import {ActionType, Action} from './ActionCreators';
-import {ImdbTable} from './ImdbTableFactory';
+import {ImdbTable, ImdbItem} from './ImdbTableFactory';
 import * as deepExtend from 'deep-extend';
 import { YEAR_MIN, YEAR_MAX } from './ImdbTableToChartDataConverter';
 
@@ -22,7 +22,7 @@ export class Reducer {
   public readonly chartsApp = combineReducers<AppState, Action>(
     {
       imdbTable, users, userLogic, xAxis, yAxis, years, ratings,
-      ratingsDiff, itemTypes, genres, reverse, animate, bezier
+      ratingsDiff, itemTypes, genres, reverse, animate, bezier, tableView
     }
   );
 
@@ -170,4 +170,11 @@ function users(state: User[], action: Action): User[] {
     })
   }
   return state;
+}
+
+function tableView(state: ImdbItem[], action: Action) {
+  if (action.type === ActionType.SetTableViewItems) {
+    return action.payload;
+  }
+  return state || null;
 }

@@ -11,6 +11,8 @@ import { ImdbTableToChartDataConverter, YEAR_MIN, YEAR_MAX } from './charts/Imdb
 import * as freeze from 'redux-freeze';
 import reduxThunk from 'redux-thunk';
 import { ImdbItemFilter } from './charts/ImdbItemFilter';
+import './charts/Popup';
+import { TablePopup } from './charts/Popup';
 
 (async () => {
 
@@ -29,6 +31,7 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
     years: [YEAR_MIN, YEAR_MAX],
     ratings: [1, 10],
     ratingsDiff: [0, 9],
+    tableView: null,
     itemTypes: {
       movie: true,
       tvMiniSeries: false,
@@ -50,13 +53,12 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
   ) as AppStore;
 
   new Persistence(store);
-
-  const actions = new ActionCreators(
-    new ImdbTableFactory()
-  );
+  const filter = new ImdbItemFilter();
+  const actions = new ActionCreators(new ImdbTableFactory(), filter);
 
   console.info('App Start...');
 
+  new TablePopup(store, actions);
   await new App(
     document.body,
     store,
@@ -65,7 +67,7 @@ import { ImdbItemFilter } from './charts/ImdbItemFilter';
       store,
       actions,
       new ImdbTableToChartDataConverter(),
-      new ImdbItemFilter()
+      filter
     )
   ).start();
 

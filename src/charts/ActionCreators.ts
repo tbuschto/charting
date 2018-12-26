@@ -1,7 +1,8 @@
-import { ImdbTable, ImdbTableFactory } from './ImdbTableFactory';
+import { ImdbTable, ImdbTableFactory, ImdbItem } from './ImdbTableFactory';
 import { TextFile } from './FilePicker';
 import { ThunkAction } from 'redux-thunk';
 import { AppState, XAxisMode, YAxisMode, ItemTypes, UserLogic, Genres } from './App';
+import { ImdbItemFilter } from './ImdbItemFilter';
 
 export enum ActionType {
   ShowUserRatings = 'SHOW_USER_RATINGS',
@@ -18,7 +19,8 @@ export enum ActionType {
   SetGenres = 'SET_GENRES',
   SetYears = 'SET_YEARS',
   SetRatings = 'SET_RATINGS',
-  SetRatingsDiff = 'SET_RATINGS_DIFF'
+  SetRatingsDiff = 'SET_RATINGS_DIFF',
+  SetTableViewItems = 'SET_TABLE_VIEW_ITEMS'
 }
 
 export type UserSelection = {[user: string]: boolean};
@@ -38,6 +40,7 @@ type SetGenres = ActionBase<typeof ActionType.SetGenres, Genres>;
 type SetYears = ActionBase<typeof ActionType.SetYears, [number, number]>;
 type SetRatings = ActionBase<typeof ActionType.SetRatings, [number, number]>;
 type SetRatingsDiff = ActionBase<typeof ActionType.SetRatingsDiff, [number, number]>;
+type SetTableViewItems = ActionBase<typeof ActionType.SetTableViewItems, ImdbItem[]>;
 
 export type Action = AddTableData
   | ShowUserRatings
@@ -52,7 +55,8 @@ export type Action = AddTableData
   | SetGenres
   | SetYears
   | SetRatings
-  | SetRatingsDiff;
+  | SetRatingsDiff
+  | SetTableViewItems;
 
 export type AsyncAction<R = Promise<void>|void> = ThunkAction<
   R,
@@ -64,7 +68,8 @@ export type AsyncAction<R = Promise<void>|void> = ThunkAction<
 export class ActionCreators {
 
   constructor(
-    private _imdbTableFactory: ImdbTableFactory
+    private _imdbTableFactory: ImdbTableFactory,
+    private _filter: ImdbItemFilter
   ) { }
 
   public showUserRatings(payload: UserSelection): ShowUserRatings {
@@ -80,6 +85,15 @@ export class ActionCreators {
           this._imdbTableFactory.createTable(userName, file.content)
         ))
       });
+    }
+  }
+
+  public showTableView(): AsyncAction {
+    return (dispatch, getState) => {
+      const state = getState();
+      dispatch(this.setTableViewItems(
+        this._filter.filter(Object.keys(state.imdbTable).map(id => state.imdbTable[id]), state)
+      ));
     }
   }
 
@@ -101,6 +115,10 @@ export class ActionCreators {
         dispatch({type: ActionType.SetYAxisMode, payload: state.yAxis});
       }
     };
+  }
+
+  public setTableViewItems(payload: ImdbItem[]): SetTableViewItems {
+    return {type: ActionType.SetTableViewItems, payload};
   }
 
   public setItemTypes(payload: ItemTypes): SetItemTypes {
@@ -137,6 +155,10 @@ export class ActionCreators {
 
   public setRatingsDiff(payload: [number, number]): SetRatingsDiff {
     return {type: ActionType.SetRatingsDiff, payload};
+  }
+
+  public setTableItems(payload: ImdbItem[]): SetTableViewItems {
+    return {type: ActionType.SetTableViewItems, payload};
   }
 
   public addIMDbTableData(userName: string, data: ImdbTable): AddTableData  {

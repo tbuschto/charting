@@ -6,7 +6,6 @@ import { from } from "rxjs";
 import { ImdbTableToChartDataConverter } from './ImdbTableToChartDataConverter';
 import * as clone from 'clone';
 import { ImdbItemFilter } from './ImdbItemFilter';
-import { Label } from './Label';
 
 const darkGray = 'rgb(51, 51, 51)'
 const white = 'rgb(220, 220, 220)';
@@ -214,6 +213,7 @@ export class ChartView extends View<'div'> {
     const options = clone(defaultOptions);
     options.onClick = (ev, elements) => {
       const el = elements as any;
+      console.log(el);
       if (el && el[0] && typeof el[0]._datasetIndex === 'number'&& typeof el[0]._index === 'number') {
         const dataset = this._chart.data.datasets[el[0]._datasetIndex];
         if (dataset.data[el[0]._index] instanceof Object) {
